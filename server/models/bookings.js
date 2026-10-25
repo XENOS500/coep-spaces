@@ -1,48 +1,44 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const bookingSchema = new mongoose.Schema(
     {
         venue: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Venue",
-            required: true,
+            required: true
         },
-
         requester: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
-            required: true,
+            required: true
         },
-
         date: {
             type: Date,
-            required: true,
+            required: true
         },
-
         startTime: {
             type: String,
-            required: true,
+            required: true
         },
-
         endTime: {
             type: String,
-            required: true,
+            required: true
         },
-
         purpose: {
             type: String,
             required: true,
             trim: true,
-            maxlength: 300,
+            maxlength: 300
         },
-
         status: {
             type: String,
             enum: ["PENDING", "APPROVED", "REJECTED"],
-            default: "PENDING",
-        },
+            default: "PENDING"
+        }
     },
     { timestamps: true }
 );
 
-module.exports = mongoose.model("Booking", bookingSchema);
+const Booking = mongoose.model("Booking", bookingSchema);
+
+export default Booking;

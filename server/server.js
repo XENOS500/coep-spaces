@@ -1,13 +1,11 @@
-require("dotenv").config();
+import "dotenv/config";
+import express from "express";
+import connectDB from "./config/db.js";
 
-const express = require("express");
-const connectDB = require("./config/db");
 const app = express();
-const Venue = require("./models/venue");
+const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
-
-const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
     await connectDB();
@@ -15,6 +13,7 @@ const startServer = async () => {
     app.listen(PORT, () => {
         console.log(`Server running on port ${PORT}`);
     });
+
 };
 
 startServer();
