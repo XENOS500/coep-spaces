@@ -1,11 +1,13 @@
 
 import Navbar from './components/layout/Navbar.jsx'
+import Footer from './components/layout/Footer.jsx'
 
 function App() {
   return (
     <main className="home-page">
       <Navbar />
 
+      {/* Hero section */}
       <section className="hero">
         <div className="hero-content">
           <p className="eyebrow">COLLEGE OF ENGINEERING PUNE</p>
@@ -48,6 +50,7 @@ function App() {
         </div>
       </section>
 
+      {/* How it works */}
       <section className="how-it-works">
         <div className="section-heading">
           <p className="eyebrow">SIMPLE BY DESIGN</p>
@@ -85,24 +88,7 @@ function App() {
         </div>
       </section>
 
-      <footer className="footer">
-        <div className="footer-brand">
-          <span className="brand-mark">C</span>
-          <div>
-            <strong>COEP Spaces</strong>
-            <p>Campus spaces, made simpler.</p>
-          </div>
-        </div>
-
-        <div className="footer-college">
-          <strong>College of Engineering Pune</strong>
-          <p>Shivajinagar, Pune, Maharashtra, India</p>
-        </div>
-
-        <p className="footer-copy">
-          © {new Date().getFullYear()} COEP Spaces
-        </p>
-      </footer>
+      <Footer />
     </main>
   )
 }
