@@ -26,7 +26,7 @@ const maxDate = new Date(now.getTime() + MAX_DAYS_AHEAD * 24 * 60 * 60 * 1000);
     return { error: { status: 400, message: `Bookings can only be made ${MAX_DAYS_AHEAD} days ahead` } };
 }
 //student count should be whole number
-if (!Number.isInteger(Number(guestCount)) || Number(guestCount)<1) {
+if (!Number.isInteger(Number(studCount)) || Number(guestCount)<1) {
     return {error : {status : 400, message : 'Guest count must be a whole number'}}
 }
 //to check if venue exists, is active and is big enough
@@ -37,7 +37,7 @@ if (!venue){
 if (venue.isActive === false){
     return {error: {status : 404 , message : 'Venue is not available for booking'}};
 }
-if (Number(guestCount)> venue.capacity){
+if (Number(studCount)> venue.capacity){
     return {error: {status : 409 , message:`Guest count exceeds venue capacity (${venue.capacity})`}};
 }
 // check for clash
