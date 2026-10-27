@@ -1,25 +1,11 @@
 
+import Navbar from './components/layout/Navbar.jsx'
+
 function App() {
   return (
     <main className="home-page">
-      {/* Navigation */}
-      <header className="navbar">
-        <a className="brand" href="/">
-          <span className="brand-mark">C</span>
-          <span>COEP Spaces</span>
-        </a>
+      <Navbar />
 
-        <nav className="nav-actions" aria-label="Main navigation">
-          <a className="login-link" href="/login">
-            Login
-          </a>
-          <a className="register-button" href="/register">
-            Register
-          </a>
-        </nav>
-      </header>
-
-      {/* Hero section */}
       <section className="hero">
         <div className="hero-content">
           <p className="eyebrow">COLLEGE OF ENGINEERING PUNE</p>
@@ -62,7 +48,6 @@ function App() {
         </div>
       </section>
 
-      {/* How it works */}
       <section className="how-it-works">
         <div className="section-heading">
           <p className="eyebrow">SIMPLE BY DESIGN</p>
@@ -100,7 +85,6 @@ function App() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="footer">
         <div className="footer-brand">
           <span className="brand-mark">C</span>
