@@ -29,4 +29,21 @@ const maxDate = new Date(now.getTime() + MAX_DAYS_AHEAD * 24 * 60 * 60 * 1000);
 if (!Number.isInteger(Number(guestCount)) || Number(guestCount)<1) {
     return {error : {status : 400, message : 'Guest count must be a whole number'}}
 }
-//
+//to check if venue exists, is active and is big enough
+const venue= await Venue.findById(venueId);
+if (!venue){
+    return {error: {status : 404 , message : 'Venue not found'}};
+}
+if (venue.isActive === false){
+    return {error: {status : 404 , message : 'Venue is not available for booking'}};
+}
+if (Number(guestCount)> venue.capacity){
+    return {error: {status : 409 , message:`Guest count exceeds venue capacity (${venue.capacity})`}};
+}
+// check for clash
+const clash = await findClash(venueId , start, end);
+if (clash){
+    return {error: {status : 409, message : 'Venue is already booked for this time slot'}};
+}
+return {start, end , venue};
+module.exports = {validateBookingInput};
