@@ -1,8 +1,10 @@
 
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Navbar from './components/layout/Navbar.jsx'
 import Footer from './components/layout/Footer.jsx'
+import NotFound from './pages/NotFound.jsx'
 
-function App() {
+function HomePage() {
   return (
     <main className="home-page">
       <Navbar />
@@ -90,6 +92,17 @@ function App() {
 
       <Footer />
     </main>
+  )
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
 
