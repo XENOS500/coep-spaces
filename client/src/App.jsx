@@ -1,121 +1,125 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
+    <main className="home-page">
+      {/* Navigation */}
+      <header className="navbar">
+        <a className="brand" href="/">
+          <span className="brand-mark">C</span>
+          <span>COEP Spaces</span>
+        </a>
+
+        <nav className="nav-actions" aria-label="Main navigation">
+          <a className="login-link" href="/login">
+            Login
+          </a>
+          <a className="register-button" href="/register">
+            Register
+          </a>
+        </nav>
+      </header>
+
+      {/* Hero section */}
+      <section className="hero">
+        <div className="hero-content">
+          <p className="eyebrow">COLLEGE OF ENGINEERING PUNE</p>
+
+          <h1>
+            The right space
+            <br />
+            for every <span>big idea.</span>
+          </h1>
+
+          <p className="hero-description">
+            Discover classrooms, seminar halls and campus venues.
+            Check availability and request a space for your next
+            academic, cultural or technical event.
           </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+          <div className="hero-note">
+            <span className="note-dot" />
+            One campus. Many possibilities.
+          </div>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
+
+        <div className="hero-gallery">
+          <img
+            className="hero-image hero-image-main"
+            src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1000&q=80"
+            alt="Bright meeting and collaboration space"
+          />
+
+          <img
+            className="hero-image hero-image-small"
+            src="https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=600&q=80"
+            alt="Modern room with tables and chairs"
+          />
+
+          <div className="gallery-label">
+            <span>01 / CAMPUS SPACES</span>
+            <strong>Made for ideas to take shape.</strong>
+          </div>
         </div>
       </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+      {/* How it works */}
+      <section className="how-it-works">
+        <div className="section-heading">
+          <p className="eyebrow">SIMPLE BY DESIGN</p>
+          <h2>How it works</h2>
+          <p>From finding a room to sending a booking request.</p>
+        </div>
+
+        <div className="steps-grid">
+          <article className="step-card">
+            <span className="step-number">01</span>
+            <h3>Find your venue</h3>
+            <p>
+              Explore available campus spaces and review their
+              capacity, facilities and location.
+            </p>
+          </article>
+
+          <article className="step-card">
+            <span className="step-number">02</span>
+            <h3>Check availability</h3>
+            <p>
+              Choose your date and time, then check whether
+              your preferred venue is available.
+            </p>
+          </article>
+
+          <article className="step-card">
+            <span className="step-number">03</span>
+            <h3>Request a booking</h3>
+            <p>
+              Submit your event details and track your booking
+              request as it awaits a decision.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="footer">
+        <div className="footer-brand">
+          <span className="brand-mark">C</span>
+          <div>
+            <strong>COEP Spaces</strong>
+            <p>Campus spaces, made simpler.</p>
+          </div>
+        </div>
+
+        <div className="footer-college">
+          <strong>College of Engineering Pune</strong>
+          <p>Shivajinagar, Pune, Maharashtra, India</p>
+        </div>
+
+        <p className="footer-copy">
+          © {new Date().getFullYear()} COEP Spaces
+        </p>
+      </footer>
+    </main>
   )
 }
 
