@@ -1738,3 +1738,332 @@ a {
 .dialog-reject-button:hover {
   background: #7d3028;
 }
+
+/* Admin venue management */
+
+.manage-venues-page {
+  min-height: 100vh;
+  padding: 0 5%;
+  background: #f3ede0;
+  color: #182c4b;
+}
+
+.manage-venues-heading {
+  max-width: 760px;
+  padding: 65px 0 35px;
+}
+
+.manage-venues-heading h1 {
+  margin: 12px 0;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(40px, 6vw, 66px);
+  font-weight: 500;
+}
+
+.manage-venues-heading h1 span {
+  color: #d94d32;
+}
+
+.manage-venues-heading > p:last-child {
+  max-width: 540px;
+  color: #687386;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.manage-venues-content {
+  padding-bottom: 65px;
+}
+
+.venue-admin-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1px solid #d8d0c2;
+  background: #fbf8f1;
+}
+
+.venue-admin-summary > div {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 22px;
+  border-right: 1px solid #d8d0c2;
+}
+
+.venue-admin-summary > div:last-child {
+  border-right: none;
+}
+
+.venue-admin-summary span {
+  color: #a04d37;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+.venue-admin-summary strong {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 32px;
+  font-weight: 500;
+}
+
+.venue-admin-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin: 42px 0 22px;
+}
+
+.venue-admin-toolbar h2 {
+  margin: 0 0 8px;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 29px;
+  font-weight: 500;
+}
+
+.venue-admin-toolbar p {
+  margin: 0;
+  color: #687386;
+  font-size: 13px;
+}
+
+.venue-add-button {
+  padding: 13px 18px;
+  border: 1px solid #286346;
+  background: #286346;
+  color: #fffdf8;
+  text-decoration: none;
+  font-size: 12px;
+  transition: background 160ms ease;
+}
+
+.venue-add-button:hover {
+  background: #1d4c35;
+}
+
+.venue-admin-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-bottom: 20px;
+}
+
+.venue-admin-filter {
+  padding: 10px 15px;
+  border: 1px solid #d8d0c2;
+  background: #fbf8f1;
+  color: #49586c;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.venue-admin-filter.active {
+  border-color: #182c4b;
+  background: #182c4b;
+  color: #fffdf8;
+}
+
+.venue-admin-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid #d8d0c2;
+  background: #fbf8f1;
+}
+
+.venue-admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 12px;
+}
+
+.venue-admin-table th {
+  padding: 16px 14px;
+  border-bottom: 1px solid #d8d0c2;
+  background: #eae1d2;
+  color: #6c5a4b;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.venue-admin-table td {
+  padding: 19px 14px;
+  border-bottom: 1px solid #e5ddd0;
+  vertical-align: middle;
+}
+
+.venue-admin-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.venue-admin-table tbody tr:hover {
+  background: #f5efe4;
+}
+
+.venue-admin-table td strong,
+.venue-admin-secondary {
+  display: block;
+}
+
+.venue-admin-table td strong {
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.venue-admin-secondary {
+  color: #687386;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.venue-admin-status {
+  display: inline-block;
+  padding: 7px 10px;
+  border: 1px solid;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.venue-admin-status.active {
+  border-color: #9ebda6;
+  background: #e5eee3;
+  color: #286346;
+}
+
+.venue-admin-status.inactive {
+  border-color: #d9aaa2;
+  background: #f5e4df;
+  color: #983d32;
+}
+
+.venue-admin-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.venue-edit-link {
+  color: #286346;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.venue-deactivate-button {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #983d32;
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.venue-deactivate-button:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.venue-admin-empty {
+  padding: 35px !important;
+  color: #687386;
+  text-align: center;
+}
+
+.venue-admin-note {
+  margin-top: 20px;
+  color: #687386;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.venue-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgb(22 30 40 / 55%);
+}
+
+.venue-dialog {
+  width: min(100%, 460px);
+  padding: 30px;
+  border: 1px solid #d8d0c2;
+  background: #fbf8f1;
+  box-shadow: 0 20px 60px rgb(0 0 0 / 18%);
+}
+
+.venue-dialog h2 {
+  margin: 12px 0;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 28px;
+  font-weight: 500;
+}
+
+.venue-dialog > p:not(.eyebrow) {
+  color: #687386;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.venue-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 25px;
+}
+
+.venue-cancel-button,
+.venue-confirm-button {
+  padding: 10px 13px;
+  border: 1px solid;
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.venue-cancel-button {
+  border-color: #d8d0c2;
+  background: transparent;
+  color: #182c4b;
+}
+
+.venue-confirm-button {
+  border-color: #983d32;
+  background: #983d32;
+  color: #fffdf8;
+}
+
+.venue-confirm-button:hover {
+  background: #7d3028;
+}
+
+@media (max-width: 650px) {
+  .venue-admin-summary > div {
+    padding: 15px 10px;
+  }
+
+  .venue-admin-summary span {
+    font-size: 9px;
+  }
+
+  .venue-admin-toolbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .venue-admin-table {
+    min-width: 760px;
+  }
+
+  .venue-dialog {
+    padding: 22px;
+  }
+}

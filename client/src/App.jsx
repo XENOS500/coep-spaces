@@ -1,9 +1,9 @@
 import VenueCatalogPage from './pages/venues/VenueCatalogPage.jsx'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-
+import ApprovalsPage from './pages/approver/ApprovalsPage.jsx'
 import Navbar from './components/layout/Navbar.jsx'
 import Footer from './components/layout/Footer.jsx'
-
+import ManageVenuesPage from './pages/admin/ManageVenuesPage.jsx'
 import LoginPage from './pages/auth/LoginPage.jsx'
 import RegisterPage from './pages/auth/RegisterPage.jsx'
 import NotFound from './pages/NotFound.jsx'
@@ -108,10 +108,15 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="*" element={<NotFound />} />
+        <Route
+          path="/admin/venues"
+          element={<ManageVenuesPage />}
+        />
         <Route path="/venues" element={<VenueCatalogPage />} />
         <Route path="/venue/:id" element={<VenueDetailsPage />} />
         <Route path="/my-bookings" element={<MyBookingsPage />} />
+        <Route path="/approvals" element={<ApprovalsPage />} />
+         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   )
