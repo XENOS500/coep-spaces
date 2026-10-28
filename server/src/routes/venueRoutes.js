@@ -1,7 +1,6 @@
 import { Router } from "express";
-import { getVenues, getVenueById } from "../controllers/venueController";
-
-import { protect } from "../middleware/authMiddleware";
+import { getVenues, getVenueById } from "../controllers/venueController.js";
+import { protect } from "../middleware/authMiddleware.js";
 
 const router = Router();
 

@@ -17,10 +17,19 @@ export const createBooking = async (req, res) => {
             venue: venueId,
             requester: req.user.id,
             eventName,
-            purpose, contactInfo, startTime: result.start,
-            endTime: result.end,
-            studCount: Number(studCount),
-        });
+            purpose,
+            contactInfo,
+            date: new Date(
+            Date.UTC(
+            result.start.getUTCFullYear(),
+            result.start.getUTCMonth(),
+            result.start.getUTCDate(),
+    ),
+  ),
+  startTime: result.start,
+  endTime: result.end,
+  studCount: Number(studCount),
+});
         res.status(201).json(booking);
     } catch (err) {
         console.error(err);
@@ -31,8 +40,7 @@ export const createBooking = async (req, res) => {
 export const getMyBookings = async (req, res) => {
     try {
         const bookings = await Booking.find({ requester: req.user.id }).populate('venue', 'name location').sort({ createdAt: -1 });
-        res.json(bookings);
-        res.json(bookings);
+        return res.json(bookings);
     } catch (err) {
         res.status(500).json({ message: 'Server error' });
     }
@@ -47,13 +55,13 @@ export const cancelBooking = async (req, res) => {
         if (booking.requester.toString() !== req.user.id.toString()) {
             return res.status(403).json({ message: 'You can only cancel your own bookings' });
         }
-        if (!['Pending', 'Approved'].includes(booking.status)) {
+        if (!["PENDING", "APPROVED"].includes(booking.status)) {
             return res.status(400).json({ message: `A ${booking.status} booking cannot be cancelled` });
         }
         if (booking.startTime <= new Date()) {
             return res.status(400).json({ message: 'this booking ha already started' });
         }
-        booking.status = 'Cancelled';
+        booking.status = "CANCELLED";
         await booking.save();
         res.json(booking);
     } catch (err) {

@@ -1,20 +1,18 @@
-import {Router} from "express"
-
-import {protect} from "../middleware/authMiddleware"
-import {authorize} from "../middleware/roleMiddleware"
+import { Router } from "express";
+import { protect } from "../middleware/authMiddleware.js";
+import { authorize } from "../middleware/roleMiddleware.js";
 
 import {
-    getPendingApprovals,
-    updateApprovalStatus
-} from "../controllers/approvalController"
+  getPendingApprovals,
+  updateApprovalStatus,
+} from "../controllers/approvalController.js";
 
-const router =Router()
+const router = Router();
 
-router.use(protect)
-router.use(authorize("approver"))
+router.use(protect);
+router.use(authorize("APPROVER"));
 
-router.get("/pending",getPendingApprovals)
-
-router.patch("/:id,updateApprovalStatus")
+router.get("/pending", getPendingApprovals);
+router.patch("/:id", updateApprovalStatus);
 
 export default router;

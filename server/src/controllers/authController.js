@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import User from "../models/user.js";
-import generateToken from "../src/utils/generateToken.js";
+import generateToken from "../utils/generateToken.js";
 
 export const registerUser = async (req, res) => {
   const { name, email, password } = req.body ?? {};
@@ -38,14 +38,14 @@ export const registerUser = async (req, res) => {
     name: name.trim(),
     email: normalizedEmail,
     passwordHash,
-    role: "requester",
+    role: "REQUESTER",
   });
 
   const token = generateToken(user._id);
 
   return res.status(200).json({
     success: true,
-    message: "Login successful",
+    message: "Registration successful",
     token,
     user: {
       id: user._id,
@@ -55,6 +55,52 @@ export const registerUser = async (req, res) => {
     },
   });
 };
+
+
+
+
+export const loginUser = async (req, res) => {
+  const { email, password } = req.body ?? {};
+
+  if (
+    typeof email !== "string" ||
+    !email.trim() ||
+    typeof password !== "string" ||
+    !password
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: "Email and password are required",
+    });
+  }
+
+  const user = await User.findOne({
+    email: email.trim().toLowerCase(),
+  });
+
+  if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
+    return res.status(401).json({
+      success: false,
+      message: "Invalid email or password",
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    message: "Login successful",
+    token: generateToken(user._id),
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    },
+  });
+};
+
+
+
+
 export const getMe = async (req, res) => {
   return res.status(200).json({
     success: true,

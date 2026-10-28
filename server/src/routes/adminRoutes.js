@@ -1,21 +1,24 @@
-import express from "express"
-import {protect} from "../middleware/authMiddleware"
-import {authorize} from "../middleware/roleMiddleware"
+import { Router } from "express";
+import { protect } from "../middleware/authMiddleware.js";
+import { authorize } from "../middleware/roleMiddleware.js";
 
 import {
-    getApprovers,
-    createVenue,
-    updateVenue,
-    deactivateVenue,
-    assignApprover,
-} from "../controllers/adminControllers"
+  getApprover,
+  createVenue,
+  updateVenue,
+  deactivateVenue,
+  assignApprover,
+} from "../controllers/adminController.js";
 
-router.use(protect)
-router.use(authorize("admin"))
+const router = Router();
 
-router.get("/approvers",getApprover)
-router.post("/venues",createVenue)
-router.patch("/venues/:id/deactivate",deactivateVenue)
-router.patch("/venues/:id/approver",assignApprover)
+router.use(protect);
+router.use(authorize("ADMIN"));
 
-export default router
+router.get("/approvers", getApprover);
+router.post("/venues", createVenue);
+router.patch("/venues/:id", updateVenue);
+router.patch("/venues/:id/deactivate", deactivateVenue);
+router.patch("/users/:id/approver", assignApprover);
+
+export default router;
