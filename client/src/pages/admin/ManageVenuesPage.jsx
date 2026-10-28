@@ -1,64 +1,67 @@
 
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import Navbar from '../../components/layout/Navbar.jsx'
-import Footer from '../../components/layout/Footer.jsx'
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import Navbar from "../../components/layout/Navbar.jsx";
+import Footer from "../../components/layout/Footer.jsx";
 
-// Temporary venue records for the frontend demonstration.
+// Temporary demonstration data.
+// The backend will eventually provide these records.
 const initialVenues = [
   {
-    id: 'venue-1',
-    name: 'Main Auditorium',
-    type: 'Auditorium',
-    building: 'Main Building',
-    room: 'Auditorium A',
+    id: "venue-1",
+    name: "Main Auditorium",
+    type: "Auditorium",
+    building: "Main Building",
+    room: "Auditorium A",
     capacity: 500,
-    approver: 'Dr. Kulkarni',
+    approver: "Dr. Kulkarni",
     active: true,
   },
   {
-    id: 'venue-2',
-    name: 'Seminar Hall 1',
-    type: 'Seminar Hall',
-    building: 'Academic Block',
-    room: 'First Floor',
+    id: "venue-2",
+    name: "Seminar Hall 1",
+    type: "Seminar Hall",
+    building: "Academic Block",
+    room: "First Floor",
     capacity: 100,
-    approver: 'Prof. Deshmukh',
+    approver: "Prof. Deshmukh",
     active: true,
   },
   {
-    id: 'venue-3',
-    name: 'Classroom B204',
-    type: 'Classroom',
-    building: 'Engineering Block B',
-    room: 'Room 204',
+    id: "venue-3",
+    name: "Classroom B204",
+    type: "Classroom",
+    building: "Engineering Block B",
+    room: "Room 204",
     capacity: 60,
-    approver: 'Dr. Patil',
+    approver: "Dr. Patil",
     active: false,
   },
-]
+];
 
 function ManageVenuesPage() {
-  const [venues, setVenues] = useState(initialVenues)
-  const [filter, setFilter] = useState('ALL')
-  const [selectedVenue, setSelectedVenue] = useState(null)
+  const [venues, setVenues] = useState(initialVenues);
+  const [filter, setFilter] = useState("ALL");
+  const [selectedVenue, setSelectedVenue] = useState(null);
 
   const filteredVenues = venues.filter((venue) => {
-    if (filter === 'ACTIVE') return venue.active
-    if (filter === 'INACTIVE') return !venue.active
-    return true
-  })
+    if (filter === "ACTIVE") return venue.active;
+    if (filter === "INACTIVE") return !venue.active;
+    return true;
+  });
 
   function handleDeactivate() {
+    if (!selectedVenue) return;
+
     setVenues((currentVenues) =>
       currentVenues.map((venue) =>
         venue.id === selectedVenue.id
           ? { ...venue, active: false }
           : venue
       )
-    )
+    );
 
-    setSelectedVenue(null)
+    setSelectedVenue(null);
   }
 
   return (
@@ -67,10 +70,12 @@ function ManageVenuesPage() {
 
       <section className="manage-venues-heading">
         <p className="eyebrow">COEP / ADMINISTRATION</p>
-        <h1>Manage <span>venues.</span></h1>
+        <h1>
+          Manage <span>venues.</span>
+        </h1>
         <p>
-          Maintain campus spaces, update venue information and
-          control which venues are available for booking.
+          Maintain campus spaces, update venue information, assign
+          approvers and control which venues are available for booking.
         </p>
       </section>
 
@@ -98,29 +103,26 @@ function ManageVenuesPage() {
             <p>Review and manage registered spaces.</p>
           </div>
 
-          <Link
-            to="/admin/venues/new"
-            className="venue-add-button"
-          >
+          <Link to="/admin/venues/new" className="venue-add-button">
             + Add venue
           </Link>
         </div>
 
         <div className="venue-admin-filters">
-          {['ALL', 'ACTIVE', 'INACTIVE'].map((option) => (
+          {["ALL", "ACTIVE", "INACTIVE"].map((option) => (
             <button
               key={option}
               type="button"
               className={
                 filter === option
-                  ? 'venue-admin-filter active'
-                  : 'venue-admin-filter'
+                  ? "venue-admin-filter active"
+                  : "venue-admin-filter"
               }
               onClick={() => setFilter(option)}
               aria-pressed={filter === option}
             >
-              {option === 'ALL'
-                ? 'All venues'
+              {option === "ALL"
+                ? "All venues"
                 : option.charAt(0) + option.slice(1).toLowerCase()}
             </button>
           ))}
@@ -158,17 +160,31 @@ function ManageVenuesPage() {
 
                   <td>{venue.capacity} people</td>
 
-                  <td>{venue.approver}</td>
+                  <td>
+                    <div className="venue-assigned-approver">
+                      <strong>
+                        {venue.approver || "Not assigned"}
+                      </strong>
+
+                      <Link
+                        to={`/admin/venues/${venue.id}/edit`}
+                        className="venue-approver-link"
+                        aria-label={`Change approver for ${venue.name}`}
+                      >
+                        {venue.approver ? "Change approver" : "Assign approver"}
+                      </Link>
+                    </div>
+                  </td>
 
                   <td>
                     <span
                       className={
                         venue.active
-                          ? 'venue-admin-status active'
-                          : 'venue-admin-status inactive'
+                          ? "venue-admin-status active"
+                          : "venue-admin-status inactive"
                       }
                     >
-                      {venue.active ? 'Active' : 'Inactive'}
+                      {venue.active ? "Active" : "Inactive"}
                     </span>
                   </td>
 
@@ -178,7 +194,7 @@ function ManageVenuesPage() {
                         to={`/admin/venues/${venue.id}/edit`}
                         className="venue-edit-link"
                       >
-                        Edit
+                        Edit details
                       </Link>
 
                       {venue.active && (
@@ -197,7 +213,7 @@ function ManageVenuesPage() {
 
               {filteredVenues.length === 0 && (
                 <tr>
-                  <td colSpan="6" className="venue-admin-empty">
+                  <td colSpan={6} className="venue-admin-empty">
                     No venues match this filter.
                   </td>
                 </tr>
@@ -207,8 +223,8 @@ function ManageVenuesPage() {
         </div>
 
         <p className="venue-admin-note">
-          Demonstration data only. Changes will persist across sessions
-          once the venue API is connected.
+          Demo data only. Approver assignments and venue changes are
+          not saved to the backend yet.
         </p>
       </section>
 
@@ -257,7 +273,7 @@ function ManageVenuesPage() {
         </div>
       )}
     </main>
-  )
+  );
 }
 
-export default ManageVenuesPage
+export default ManageVenuesPage;

@@ -4,30 +4,47 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 
 const mockVenues = [
   {
-    id: "1",
+    id: "venue-1",
     name: "Main Auditorium",
     type: "Auditorium",
     capacity: 500,
     building: "Main Building",
     floor: "Ground Floor",
-    room: "Auditorium",
+    room: "Auditorium A",
     image: "",
-    approver: "Prof. Sharma",
+    approver: "Dr. Kulkarni",
   },
   {
-    id: "2",
-    name: "Seminar Hall A",
+    id: "venue-2",
+    name: "Seminar Hall 1",
     type: "Seminar Hall",
-    capacity: 120,
-    building: "Academic Complex",
+    capacity: 100,
+    building: "Academic Block",
     floor: "First Floor",
-    room: "A-101",
+    room: "First Floor",
     image: "",
-    approver: "Prof. Patil",
+    approver: "Prof. Deshmukh",
+  },
+  {
+    id: "venue-3",
+    name: "Classroom B204",
+    type: "Classroom",
+    capacity: 60,
+    building: "Engineering Block B",
+    floor: "Second Floor",
+    room: "Room 204",
+    image: "",
+    approver: "Dr. Patil",
   },
 ];
 
-const approvers = ["Prof. Sharma", "Prof. Patil", "Prof. Deshmukh"];
+const approvers = [
+  "Dr. Kulkarni",
+  "Prof. Deshmukh",
+  "Dr. Patil",
+];
+
+
 
 const emptyVenue = {
   name: "",

@@ -2862,3 +2862,29 @@ a {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Assigned approver in admin venue table */
+
+.venue-assigned-approver {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.venue-assigned-approver strong {
+  color: #20352d;
+  font-size: 0.88rem;
+}
+
+.venue-approver-link {
+  color: #286346;
+  font-size: 0.78rem;
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.venue-approver-link:hover {
+  color: #a04d37;
+}
