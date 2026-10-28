@@ -1,42 +1,9 @@
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from '../../components/layout/Navbar.jsx'
 import Footer from '../../components/layout/Footer.jsx'
-
-// Temporary data until the booking API is ready.
-const demoBookings = [
-  {
-    id: 'BK-1024',
-    venue: 'Main Auditorium',
-    date: '2026-11-05',
-    startTime: '10:00',
-    endTime: '12:00',
-    purpose: 'Technical workshop',
-    attendees: 120,
-    status: 'PENDING',
-  },
-  {
-    id: 'BK-1018',
-    venue: 'Seminar Hall 1',
-    date: '2026-11-02',
-    startTime: '14:00',
-    endTime: '16:00',
-    purpose: 'Student club meeting',
-    attendees: 45,
-    status: 'APPROVED',
-  },
-  {
-    id: 'BK-1009',
-    venue: 'Classroom B204',
-    date: '2026-10-20',
-    startTime: '09:00',
-    endTime: '11:00',
-    purpose: 'Project discussion',
-    attendees: 25,
-    status: 'REJECTED',
-  },
-]
+import { getBookings } from '../../data/demoStore.js'
 
 const filters = ['ALL', 'PENDING', 'APPROVED', 'REJECTED']
 
@@ -60,13 +27,44 @@ function formatTime(time) {
 }
 
 function MyBookingsPage() {
+  const [bookings, setBookings] = useState(() => getBookings())
   const [selectedFilter, setSelectedFilter] = useState('ALL')
 
-  const filteredBookings = demoBookings.filter((booking) => {
-    return (
-      selectedFilter === 'ALL' || booking.status === selectedFilter
-    )
+  useEffect(() => {
+    function refreshBookings() {
+      setBookings(getBookings())
+    }
+
+    window.addEventListener('focus', refreshBookings)
+    window.addEventListener('pageshow', refreshBookings)
+    window.addEventListener('coep-demo-data-changed', refreshBookings)
+    window.addEventListener('storage', refreshBookings)
+
+    return () => {
+      window.removeEventListener('focus', refreshBookings)
+      window.removeEventListener('pageshow', refreshBookings)
+      window.removeEventListener('coep-demo-data-changed', refreshBookings)
+      window.removeEventListener('storage', refreshBookings)
+    }
+  }, [])
+
+  // Filter by the demo Booker identity when one is set.
+  const currentEmail = sessionStorage.getItem('demoBookerEmail')
+  const myBookings = currentEmail
+    ? bookings.filter((booking) => booking.email === currentEmail)
+    : bookings
+
+  const filteredBookings = myBookings.filter((booking) => {
+    return selectedFilter === 'ALL' || booking.status === selectedFilter
   })
+
+  const pendingCount = myBookings.filter(
+    (booking) => booking.status === 'PENDING'
+  ).length
+
+  const approvedCount = myBookings.filter(
+    (booking) => booking.status === 'APPROVED'
+  ).length
 
   return (
     <main className="my-bookings-page">
@@ -85,19 +83,15 @@ function MyBookingsPage() {
         <div className="booking-summary">
           <div>
             <span>TOTAL REQUESTS</span>
-            <strong>{demoBookings.length}</strong>
+            <strong>{myBookings.length}</strong>
           </div>
           <div>
             <span>AWAITING DECISION</span>
-            <strong>
-              {demoBookings.filter((b) => b.status === 'PENDING').length}
-            </strong>
+            <strong>{pendingCount}</strong>
           </div>
           <div>
             <span>APPROVED</span>
-            <strong>
-              {demoBookings.filter((b) => b.status === 'APPROVED').length}
-            </strong>
+            <strong>{approvedCount}</strong>
           </div>
         </div>
 
@@ -168,10 +162,13 @@ function MyBookingsPage() {
             ))
           ) : (
             <div className="bookings-empty">
-              <h3>No {selectedFilter.toLowerCase()} bookings</h3>
+              <h3>
+                {myBookings.length === 0
+                  ? 'No bookings yet'
+                  : `No ${selectedFilter.toLowerCase()} bookings`}
+              </h3>
               <p>
-                Try another status filter or explore campus venues
-                to start a request.
+                Explore campus venues to find a space for your next event.
               </p>
               <Link to="/venues" className="booking-primary-link">
                 Browse venues
@@ -181,8 +178,8 @@ function MyBookingsPage() {
         </div>
 
         <p className="demo-data-note">
-          Demonstration data only. Your actual requests will appear
-          here once the booking API is connected.
+          Demo mode: bookings are read from browser storage. Real
+          accounts and server persistence require backend integration.
         </p>
       </section>
 
