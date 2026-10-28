@@ -2,6 +2,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Navbar from './components/layout/Navbar.jsx'
 import Footer from './components/layout/Footer.jsx'
+import LoginPage from './pages/auth/LoginPage.jsx'
 import NotFound from './pages/NotFound.jsx'
 
 function HomePage() {
@@ -9,7 +10,6 @@ function HomePage() {
     <main className="home-page">
       <Navbar />
 
-      {/* Hero section */}
       <section className="hero">
         <div className="hero-content">
           <p className="eyebrow">COLLEGE OF ENGINEERING PUNE</p>
@@ -52,7 +52,6 @@ function HomePage() {
         </div>
       </section>
 
-      {/* How it works */}
       <section className="how-it-works">
         <div className="section-heading">
           <p className="eyebrow">SIMPLE BY DESIGN</p>
@@ -100,6 +99,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
