@@ -19,14 +19,16 @@ function LoginPage() {
     }
 
     // Demo role selection only. Replace with backend authentication later.
+  // Demo role selection only; not secure authentication.
+    sessionStorage.setItem("demoRole", role);
     setError("");
 
     if (role === "ADMIN") {
-      navigate("/admin/venues");
+    navigate("/admin/venues");
     } else if (role === "APPROVER") {
-      navigate("/approvals");
+    navigate("/approvals");
     } else {
-      navigate("/venues");
+    navigate("/venues");
     }
   }
 
