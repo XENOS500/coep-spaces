@@ -1,16 +1,16 @@
-
+import { getUser, clearSession } from "../../services/api.js";
 import { Link, useNavigate } from "react-router-dom";
 
 function Navbar() {
   const navigate = useNavigate();
 
   // Demo role only; real authentication will come from the backend.
-  const role = sessionStorage.getItem("demoRole");
+const role = getUser()?.role;
 
   function handleLogout() {
-    sessionStorage.removeItem("demoRole");
-    navigate("/login");
-  }
+  clearSession();
+  navigate("/login", { replace: true });
+}
 
   let navLinks = [];
 
@@ -24,7 +24,7 @@ function Navbar() {
       { label: "Venues", path: "/venues" },
       { label: "Approvals", path: "/approvals" },
     ];
-  } else if (role === "BOOKER") {
+  } else if (role === "REQUESTER")  {
     navLinks = [
       { label: "Venues", path: "/venues" },
       { label: "My Bookings", path: "/my-bookings" },

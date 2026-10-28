@@ -1,6 +1,7 @@
 
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from "react-router-dom";
+import { api, saveSession } from "../../services/api.js";
 
 function RegisterPage() {
   const [name, setName] = useState('')
@@ -8,18 +9,45 @@ function RegisterPage() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
-  function handleSubmit(event) {
-    event.preventDefault()
-    setError('')
+  async function handleSubmit(event) {
+  event.preventDefault();
+  setError("");
 
-    if (password !== confirmPassword) {
-      setError('Passwords do not match.')
-      return
-    }
+  if (loading) return;
 
-    setError('Registration is not connected to the backend yet.')
+  if (password !== confirmPassword) {
+    setError("Passwords do not match.");
+    return;
   }
+
+  if (password.length < 8 || password.length > 72) {
+    setError("Password must contain 8–72 characters.");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const data = await api("/auth/register", {
+      method: "POST",
+      body: {
+        name: name.trim(),
+        email: email.trim(),
+        password,
+      },
+    });
+
+    saveSession(data);
+    navigate("/venues", { replace: true });
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+}
 
   return (
     <main className="auth-page">
@@ -123,8 +151,8 @@ function RegisterPage() {
               </p>
             )}
 
-            <button className="auth-submit" type="submit">
-              Create account
+            <button className="auth-submit" type="submit" disabled={loading}>
+              {loading ? "Creating account..." : "Create account"}
             </button>
           </form>
 

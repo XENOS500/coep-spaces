@@ -1,42 +1,54 @@
 
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { api, saveSession } from "../../services/api.js";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState("BOOKER");
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
 
-  function handleSubmit(event) {
-    event.preventDefault();
+  async function handleSubmit(event) {
+  event.preventDefault();
+  setError("");
 
-    if (!email.trim() || !password.trim()) {
-      setError("Please enter your email and password.");
-      return;
-    }
+  if (loading) return;
 
-    // Demo role selection only; not secure authentication.
-    sessionStorage.setItem("demoRole", role);
-    sessionStorage.setItem("demoBookerEmail", email);
-    sessionStorage.setItem("demoBookerName", email.split("@")[0]);
-
-    if (role === "APPROVER") {
-      sessionStorage.setItem("demoApproverName", email.split("@")[0]);
-    }
-
-    setError("");
-
-    if (role === "ADMIN") {
-      navigate("/admin/venues");
-    } else if (role === "APPROVER") {
-      navigate("/approvals");
-    } else {
-      navigate("/venues");
-    }
+  if (!email.trim() || !password) {
+    setError("Please enter your email and password.");
+    return;
   }
+
+  setLoading(true);
+
+  try {
+    const data = await api("/auth/login", {
+      method: "POST",
+      body: {
+        email: email.trim(),
+        password,
+      },
+    });
+
+    saveSession(data);
+
+    const destination =
+      data.user.role === "ADMIN"
+        ? "/admin/venues"
+        : data.user.role === "APPROVER"
+          ? "/approvals"
+          : "/venues";
+
+    navigate(destination, { replace: true });
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+}
 
   return (
     <main className="auth-page">
@@ -75,7 +87,7 @@ function LoginPage() {
           <p className="eyebrow">WELCOME BACK</p>
           <h2>Sign in</h2>
           <p className="auth-card-description">
-            Enter your details and choose a demo role to continue.
+            Enter your email and password to continue.
           </p>
 
           <form onSubmit={handleSubmit}>
@@ -105,18 +117,7 @@ function LoginPage() {
               />
             </div>
 
-            <div className="form-field">
-              <label htmlFor="role">Continue as</label>
-              <select
-                id="role"
-                value={role}
-                onChange={(event) => setRole(event.target.value)}
-              >
-                <option value="BOOKER">Booker</option>
-                <option value="APPROVER">Approver</option>
-                <option value="ADMIN">Admin</option>
-              </select>
-            </div>
+            
 
             {error && (
               <p className="auth-error" role="alert">
@@ -124,8 +125,8 @@ function LoginPage() {
               </p>
             )}
 
-            <button className="auth-submit" type="submit">
-              Continue to dashboard
+            <button className="auth-submit" type="submit" disabled={loading}>
+               {loading ? "Signing in..." : "Sign in"}
             </button>
           </form>
 
@@ -134,9 +135,7 @@ function LoginPage() {
             <Link to="/register">Create an account</Link>
           </p>
 
-          <p className="demo-note">
-            Demo mode: role selection does not verify your identity.
-          </p>
+          
         </div>
       </section>
     </main>

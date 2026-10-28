@@ -1,6 +1,6 @@
 
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-
+import { BrowserRouter, Routes, Route, Link,useNavigate, } from "react-router-dom";
+import { getUser, clearSession } from "./services/api.js";
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
 import VenueCatalogPage from "./pages/venues/VenueCatalogPage";
@@ -10,9 +10,24 @@ import ApprovalsPage from "./pages/approver/ApprovalsPage";
 import ManageVenuesPage from "./pages/admin/ManageVenuesPage";
 import VenueFormPage from "./pages/admin/VenueFormPage";
 
+
 import "./index.css";
 
 function HomePage() {
+  const user = getUser();
+const navigate = useNavigate();
+
+const dashboardPath =
+  user?.role === "ADMIN"
+    ? "/admin/venues"
+    : user?.role === "APPROVER"
+      ? "/approvals"
+      : "/venues";
+
+function handleLogout() {
+  clearSession();
+  navigate("/login", { replace: true });
+}
   return (
     <div className="home-page">
       <header className="home-navbar">
@@ -48,14 +63,20 @@ function HomePage() {
             </p>
 
             <div className="home-hero-actions">
-              <Link to="/login" className="home-primary-button">
-                Get started <span aria-hidden="true">↗</span>
-              </Link>
+            <Link
+              to={user ? dashboardPath : "/login"}
+              className="home-primary-button"
+            >
+              {user ? "Go to dashboard" : "Get started"}
+              {" "}<span aria-hidden="true">↗</span>
+            </Link>
 
+            {!user && (
               <Link to="/register" className="home-secondary-button">
                 Create an account
               </Link>
-            </div>
+            )}
+          </div>
 
             <p className="home-supporting-note">
               Discover a space. Make a request. Bring people together.
@@ -126,7 +147,7 @@ function HomePage() {
             <p className="home-eyebrow">YOUR NEXT PLAN STARTS HERE</p>
             <h2>Let's make space for it.</h2>
           </div>
-          <Link to="/login" className="home-primary-button">
+          <Link to={user ? "/venues" : "/login"} className="home-primary-button">
             Explore COEP Spaces <span aria-hidden="true">↗</span>
           </Link>
         </section>
