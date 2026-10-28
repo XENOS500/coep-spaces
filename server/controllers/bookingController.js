@@ -32,7 +32,6 @@ export const getMyBookings = async (req, res) => {
     try {
         const bookings = await Booking.find({ requester: req.user.id }).populate('venue', 'name location').sort({ createdAt: -1 });
         res.json(bookings);
-        res.json(bookings);
     } catch (err) {
         res.status(500).json({ message: 'Server error' });
     }
