@@ -1,8 +1,9 @@
-const Booking = require('../models/Booking');
-const BLOCKING_STATUSES = ['PENDING','APPROVED']; //these statuses block a time slot
-
+import Booking from "../models/bookings.js";
+export const BLOCKING_STATUSES = ["PENDING", "APPROVED"];//these statuses block a time slot
+// Returns the first booking that overlaps [start, end), or null.
+// Overlap rule: existing.start < new.end AND existing.end > new.start
 //exclude booking id allows to recheck a booking without clashing with itself
-async function findClash(venueId, start, end, excludeBookingId = null){
+export async function findClash(venueId, start, end, excludeBookingId = null){
     const query = {
     venue: venueId,
     status: { $in: BLOCKING_STATUSES },
@@ -13,13 +14,13 @@ async function findClash(venueId, start, end, excludeBookingId = null){
   return Booking.findOne(query);
 }
 
-async function isVenueAvailable(venueId, start, end) {
+export async function isVenueAvailable(venueId, start, end) {
   const clash = await findClash(venueId, start, end);
   return !clash;
 }
-
-//date format : YYYY-MM-DD
-async function getBookingsForDay(venueId, date){
+// All Pending/Approved bookings for a venue on one day
+//date format : YYYY-MM-DD (UTC day)
+export async function getBookingsForDay(venueId, date){
     const dayStart = new Date(`${date}T00:00:00.000Z`);
     const dayEnd = new Date(`${date}T23:59:59.999Z`);
     return Booking.find(
@@ -31,4 +32,3 @@ async function getBookingsForDay(venueId, date){
         }
     ).select('startTime endTime status eventName').sort({startTime : 1});
 }
-module.exports = { findClash, isVenueAvailable, getBookingsForDay, BLOCKING_STATUSES };
