@@ -1,125 +1,167 @@
-import VenueCatalogPage from './pages/venues/VenueCatalogPage.jsx'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import ApprovalsPage from './pages/approver/ApprovalsPage.jsx'
-import Navbar from './components/layout/Navbar.jsx'
-import Footer from './components/layout/Footer.jsx'
-import ManageVenuesPage from './pages/admin/ManageVenuesPage.jsx'
-import LoginPage from './pages/auth/LoginPage.jsx'
-import RegisterPage from './pages/auth/RegisterPage.jsx'
-import NotFound from './pages/NotFound.jsx'
-import VenueDetailsPage from './pages/venues/VenueDetailsPage.jsx'
-import MyBookingsPage from './pages/bookings/MyBookingsPage.jsx'
 
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import VenueCatalogPage from "./pages/VenueCatalogPage";
+import VenueDetailsPage from "./pages/VenueDetailsPage";
+import MyBookingsPage from "./pages/MyBookingsPage";
+import ApprovalsPage from "./pages/ApprovalsPage";
+import ManageVenuesPage from "./pages/admin/ManageVenuesPage";
+import VenueFormPage from "./pages/admin/VenueFormPage";
+
+// Home page
 function HomePage() {
   return (
-    <main className="home-page">
-      <Navbar />
+    <>
+      <header className="navbar">
+        <Link to="/" className="logo">
+          COEP <span>Spaces</span>
+        </Link>
 
-      {/* Hero section */}
-      <section className="hero">
-        <div className="hero-content">
-          <p className="eyebrow">COLLEGE OF ENGINEERING PUNE</p>
+        <nav className="nav-links">
+          <Link to="/login">Login</Link>
+          <Link to="/register" className="nav-register-button">
+            Register
+          </Link>
+        </nav>
+      </header>
 
-          <h1>
-            The right space
-            <br />
-            for every <span>big idea.</span>
-          </h1>
+      <main>
+        <section className="hero-section">
+          <div className="hero-content">
+            <p className="eyebrow">YOUR CAMPUS, YOUR SPACE</p>
 
-          <p className="hero-description">
-            Discover classrooms, seminar halls and campus venues.
-            Check availability and request a space for your next
-            academic, cultural or technical event.
-          </p>
+            <h1>
+              Find the right space
+              <br />
+              for what matters.
+            </h1>
 
-          <div className="hero-note">
-            <span className="note-dot" />
-            One campus. Many possibilities.
+            <p className="hero-description">
+              A simpler way for the COEP community to discover campus venues
+              and organise classes, meetings, events and more.
+            </p>
+
+            <div className="hero-actions">
+              <Link to="/login" className="primary-button">
+                Get started
+              </Link>
+
+              <Link to="/register" className="secondary-button">
+                Create an account
+              </Link>
+            </div>
           </div>
-        </div>
 
-        <div className="hero-gallery">
-          <img
-            className="hero-image hero-image-main"
-            src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1000&q=80"
-            alt="Bright meeting and collaboration space"
-          />
-
-          <img
-            className="hero-image hero-image-small"
-            src="https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=600&q=80"
-            alt="Modern room with tables and chairs"
-          />
-
-          <div className="gallery-label">
-            <span>01 / CAMPUS SPACES</span>
-            <strong>Made for ideas to take shape.</strong>
+          <div className="hero-image">
+            <img
+              src="https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1200&q=85"
+              alt="University campus building"
+            />
+            <div className="hero-image-caption">
+              <span>COEP TECHNOLOGICAL UNIVERSITY</span>
+              <span>Spaces for every occasion</span>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* How it works */}
-      <section className="how-it-works">
-        <div className="section-heading">
-          <p className="eyebrow">SIMPLE BY DESIGN</p>
-          <h2>How it works</h2>
-          <p>From finding a room to sending a booking request.</p>
-        </div>
+        <section className="how-it-works">
+          <p className="eyebrow">MADE FOR CAMPUS LIFE</p>
+          <h2>From idea to booked.</h2>
 
-        <div className="steps-grid">
-          <article className="step-card">
-            <span className="step-number">01</span>
-            <h3>Find your venue</h3>
-            <p>
-              Explore available campus spaces and review their
-              capacity, facilities and location.
-            </p>
-          </article>
+          <div className="steps-grid">
+            <article className="step-card">
+              <span className="step-number">01</span>
+              <h3>Discover</h3>
+              <p>
+                Explore campus venues and compare their capacity, location
+                and facilities.
+              </p>
+            </article>
 
-          <article className="step-card">
-            <span className="step-number">02</span>
-            <h3>Check availability</h3>
-            <p>
-              Choose your date and time, then check whether
-              your preferred venue is available.
-            </p>
-          </article>
+            <article className="step-card">
+              <span className="step-number">02</span>
+              <h3>Request</h3>
+              <p>
+                Choose a date and time, provide the details and submit your
+                booking request.
+              </p>
+            </article>
 
-          <article className="step-card">
-            <span className="step-number">03</span>
-            <h3>Request a booking</h3>
-            <p>
-              Submit your event details and track your booking
-              request as it awaits a decision.
-            </p>
-          </article>
-        </div>
-      </section>
+            <article className="step-card">
+              <span className="step-number">03</span>
+              <h3>Get approval</h3>
+              <p>
+                Follow your booking status while the assigned approver
+                reviews your request.
+              </p>
+            </article>
+          </div>
+        </section>
+      </main>
 
-      <Footer />
-    </main>
-  )
+      <footer className="site-footer">
+        <Link to="/" className="logo">
+          COEP <span>Spaces</span>
+        </Link>
+        <p>Campus spaces, made easier to organise.</p>
+        <span>COEP Technological University</span>
+      </footer>
+    </>
+  );
 }
 
+// Fallback page for unknown URLs
+function NotFound() {
+  return (
+    <main className="not-found-page">
+      <p className="eyebrow">404 / PAGE NOT FOUND</p>
+      <h1>This space doesn't exist.</h1>
+      <p>
+        The page may have moved, or the address may be incorrect.
+      </p>
+      <Link to="/" className="primary-button">
+        Return home
+      </Link>
+    </main>
+  );
+}
+
+// Application routes
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Public pages */}
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route
-          path="/admin/venues"
-          element={<ManageVenuesPage />}
-        />
+
+        {/* Booker pages */}
         <Route path="/venues" element={<VenueCatalogPage />} />
         <Route path="/venue/:id" element={<VenueDetailsPage />} />
         <Route path="/my-bookings" element={<MyBookingsPage />} />
+
+        {/* Approver page */}
         <Route path="/approvals" element={<ApprovalsPage />} />
-         <Route path="*" element={<NotFound />} />
+
+        {/* Admin pages */}
+        <Route path="/admin/venues" element={<ManageVenuesPage />} />
+        <Route
+          path="/admin/venues/new"
+          element={<VenueFormPage />}
+        />
+        <Route
+          path="/admin/venues/:id/edit"
+          element={<VenueFormPage />}
+        />
+
+        {/* Unknown routes */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;

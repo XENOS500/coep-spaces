@@ -2067,3 +2067,256 @@ a {
     padding: 22px;
   }
 }
+
+/* Admin add/edit venue form */
+
+.venue-form-page {
+  min-height: 100vh;
+  padding: 52px 7%;
+  background: #f3ede0;
+  color: #182c4b;
+}
+
+.venue-form-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 0 auto 28px;
+  max-width: 1000px;
+}
+
+.venue-form-heading h1,
+.venue-form-card h1 {
+  margin: 8px 0 10px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+
+.eyebrow {
+  margin: 0;
+  color: #a04d37;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+}
+
+.form-intro {
+  max-width: 560px;
+  margin: 0;
+  color: #657080;
+  line-height: 1.7;
+}
+
+.venue-form-card {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 34px;
+  border: 1px solid #e2d9c9;
+  border-radius: 10px;
+  background: #fffdf8;
+  box-shadow: 0 12px 32px rgba(24, 44, 75, 0.06);
+}
+
+.form-section-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.form-section-number {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  place-items: center;
+  border: 1px solid #d9c7ad;
+  border-radius: 50%;
+  color: #a04d37;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.form-section-heading h2 {
+  margin: 2px 0 5px;
+  font-size: 1.15rem;
+  font-weight: 650;
+}
+
+.form-section-heading p {
+  margin: 0;
+  color: #7a8088;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.venue-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.form-field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 9px;
+  color: #263b55;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.form-field.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-field input,
+.form-field select {
+  width: 100%;
+  min-height: 46px;
+  padding: 12px 13px;
+  border: 1px solid #dcd5c8;
+  border-radius: 5px;
+  outline: none;
+  background: #fffefa;
+  color: #182c4b;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 400;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.form-field input::placeholder {
+  color: #a1a3a4;
+}
+
+.form-field input:focus,
+.form-field select:focus {
+  border-color: #286346;
+  box-shadow: 0 0 0 3px rgba(40, 99, 70, 0.12);
+}
+
+.second-form-section {
+  margin-top: 36px;
+}
+
+.venue-form-card > .form-field {
+  max-width: 490px;
+}
+
+.venue-form-error {
+  margin: 22px 0 0;
+  color: #b42318;
+  font-size: 0.9rem;
+}
+
+.venue-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 34px;
+  padding-top: 24px;
+  border-top: 1px solid #e9e1d5;
+}
+
+.primary-button,
+.secondary-button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 20px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 650;
+  text-decoration: none;
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.primary-button {
+  background: #286346;
+  color: #fffdf8;
+}
+
+.primary-button:hover {
+  background: #1d4d35;
+  transform: translateY(-1px);
+}
+
+.secondary-button {
+  border-color: #d8d0c2;
+  background: transparent;
+  color: #182c4b;
+}
+
+.secondary-button:hover {
+  background: #f3ede0;
+}
+
+.text-link {
+  flex-shrink: 0;
+  margin-top: 8px;
+  color: #286346;
+  font-size: 0.9rem;
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.text-link:hover {
+  text-decoration: underline;
+}
+
+.form-back-link {
+  margin-top: 20px;
+}
+
+.demo-note {
+  margin: 18px 0 0;
+  color: #85827b;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  text-align: right;
+}
+
+@media (max-width: 640px) {
+  .venue-form-page {
+    padding: 30px 16px;
+  }
+
+  .venue-form-heading {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .venue-form-card {
+    padding: 22px 18px;
+  }
+
+  .venue-form-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .form-field.full-width {
+    grid-column: auto;
+  }
+
+  .venue-form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .venue-form-actions a,
+  .venue-form-actions button {
+    width: 100%;
+  }
+
+  .demo-note {
+    text-align: left;
+  }
+}
