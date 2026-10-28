@@ -7,6 +7,7 @@ import Footer from './components/layout/Footer.jsx'
 import LoginPage from './pages/auth/LoginPage.jsx'
 import RegisterPage from './pages/auth/RegisterPage.jsx'
 import NotFound from './pages/NotFound.jsx'
+import VenueDetailsPage from './pages/venues/VenueDetailsPage.jsx'
 
 function HomePage() {
   return (
@@ -108,6 +109,7 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="*" element={<NotFound />} />
         <Route path="/venues" element={<VenueCatalogPage />} />
+        <Route path="/venue/:id" element={<VenueDetailsPage />} />
       </Routes>
     </BrowserRouter>
   )
