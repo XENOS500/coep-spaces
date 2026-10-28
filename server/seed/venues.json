@@ -1,0 +1,387 @@
+[
+  {
+    "name": "NC 01",
+    "location": "Academic Complex Building, 1st Floor",
+    "capacity": 72,
+    "facilities": [],
+    "isActive": true
+  },
+  {
+    "name": "NC 02",
+    "location": "Academic Complex Building, 1st Floor",
+    "capacity": 72,
+    "facilities": [],
+    "isActive": true
+  },
+  {
+    "name": "NC 03",
+    "location": "Academic Complex Building, 1st Floor",
+    "capacity": 72,
+    "facilities": [],
+    "isActive": true
+  },
+  {
+    "name": "NC 04",
+    "location": "Academic Complex Building, 1st Floor",
+    "capacity": 72,
+    "facilities": [],
+    "isActive": true
+  },
+  {
+    "name": "NC 05",
+    "location": "Academic Complex Building, 2nd floor",
+    "capacity": 72,
+    "facilities": ["Projector", "Mic", "Speaker", "Wifi"],
+    "isActive": true
+  },
+  {
+    "name": "NC 06",
+    "location": "Academic Complex Building, 2nd floor",
+    "capacity": 72,
+    "facilities": ["Projector", "Mic", "Speaker", "Wifi"],
+    "isActive": true
+  },
+  {
+    "name": "NC 07",
+    "location": "Academic Complex Building, 2nd floor",
+    "capacity": 72,
+    "facilities": ["Projector", "Mic", "Speaker", "Wifi"],
+    "isActive": true
+  },
+  {
+    "name": "NC 08",
+    "location": "Academic Complex Building, 2nd floor",
+    "capacity": 72,
+    "facilities": [],
+    "isActive": true
+  },
+  {
+    "name": "Seminar Hall",
+    "location": "E&TC Extension Building, Ground Floor",
+    "capacity": 60,
+    "facilities": ["TV", "Wifi"],
+    "isActive": true
+  },
+  {
+    "name": "Class Room-1",
+    "location": "E&TC Old Building, Ground Floor",
+    "capacity": 80,
+    "facilities": [],
+    "isActive": true
+  },
+  {
+    "name": "Class Room-2",
+    "location": "E&TC Old Building, Ground Floor",
+    "capacity": 50,
+    "facilities": [],
+    "isActive": true
+  },
+  {
+    "name": "Class Room-3",
+    "location": "E&TC Old Building, Ground Floor",
+    "capacity": 80,
+    "facilities": [],
+    "isActive": true
+  },
+  {
+    "name": "Seminar Hall-1",
+    "location": "E&TC Old Building, 2nd Floor",
+    "capacity": 50,
+    "facilities": [],
+    "isActive": true
+  },
+  {
+    "name": "Seminar Hall-2",
+    "location": "E&TC Old Building, 2nd Floor",
+    "capacity": 25,
+    "facilities": [],
+    "isActive": true
+  },
+  {
+    "name": "Seminar Hall I",
+    "location": "Department of Instrumentation and Control Engineering, Ground Floor",
+    "capacity": 40,
+    "facilities": ["Smart Board", "MIC", "wifi"],
+    "isActive": true
+  },
+  {
+    "name": "Class Room",
+    "location": "Department of Instrumentation and Control Engineering, 2nd Floor",
+    "capacity": 60,
+    "facilities": ["TV", "Wifi"],
+    "isActive": true
+  },
+  {
+    "name": "Seminar Hall II",
+    "location": "Department of Instrumentation and Control Engineering, 2nd Floor",
+    "capacity": 40,
+    "facilities": ["TV", "Wifi"],
+    "isActive": true
+  },
+  {
+    "name": "basement (Fluid Lab)",
+    "location": "Applied Mech, basement (Fluid Lab)",
+    "capacity": 30,
+    "facilities": [],
+    "isActive": true
+  },
+  {
+    "name": "Class Room 1",
+    "location": "Applied Mech, First Floor",
+    "capacity": 30,
+    "facilities": ["Projector"],
+    "isActive": true
+  },
+  {
+    "name": "Class Room No 2",
+    "location": "Applied Mech, Applied Mech",
+    "capacity": 30,
+    "facilities": [],
+    "isActive": true
+  },
+  {
+    "name": "Class Room No 1",
+    "location": "Applied Mech, Applied Mech",
+    "capacity": 30,
+    "facilities": [],
+    "isActive": true
+  },
+  {
+    "name": "Applied Mech Seminar Hall",
+    "location": "Applied Mech, Ground Floor",
+    "capacity": 40,
+    "facilities": ["Projector"],
+    "isActive": true
+  },
+  {
+    "name": "Class Room No 22",
+    "location": "Applied Mech, 1st Floor",
+    "capacity": 80,
+    "facilities": ["Projector"],
+    "isActive": true
+  },
+  {
+    "name": "ME-001",
+    "location": "Mechanical Old Bajaj Building, Ground Floor",
+    "capacity": 90,
+    "facilities": ["Projector", "Wifi", "Mic"],
+    "isActive": true
+  },
+  {
+    "name": "ME-002",
+    "location": "Mechanical Old Bajaj Building, Ground Floor",
+    "capacity": 120,
+    "facilities": ["Projector", "Wifi", "Mic"],
+    "isActive": true
+  },
+  {
+    "name": "ME-003",
+    "location": "Mechanical Old Bajaj Building, Ground Floor",
+    "capacity": 120,
+    "facilities": ["Projector", "Wifi", "Mic"],
+    "isActive": true
+  },
+  {
+    "name": "Conference Room",
+    "location": "Mechanical Old Bajaj Building, Ground Floor",
+    "capacity": 15,
+    "facilities": ["TV", "Wifi"],
+    "isActive": true
+  },
+  {
+    "name": "ME-101",
+    "location": "Mechanical Old Bajaj Building, 1st Floor",
+    "capacity": 30,
+    "facilities": ["TV", "Wifi"],
+    "isActive": true
+  },
+  {
+    "name": "ME-201",
+    "location": "Mechanical Old Bajaj Building, 2nd Floor",
+    "capacity": 90,
+    "facilities": ["Projector", "Wifi", "Mic"],
+    "isActive": true
+  },
+  {
+    "name": "ME-301",
+    "location": "Mechanical Old Bajaj Building, 2nd floor",
+    "capacity": 40,
+    "facilities": ["TV", "Wifi"],
+    "isActive": true
+  },
+  {
+    "name": "ME-108",
+    "location": "Mechanical New Bajaj Building, First Floor",
+    "capacity": 36,
+    "facilities": ["No Wifi"],
+    "isActive": true
+  },
+  {
+    "name": "ME-110",
+    "location": "Mechanical New Bajaj Building, First Floor",
+    "capacity": 18,
+    "facilities": ["No Wifi"],
+    "isActive": true
+  },
+  {
+    "name": "ME-201",
+    "location": "Mechanical New Bajaj Building, Second Floor",
+    "capacity": 18,
+    "facilities": ["No Wifi"],
+    "isActive": true
+  },
+  {
+    "name": "Drawing Hall",
+    "location": "Mechanical New Bajaj Building, Drawing Hall",
+    "capacity": 180,
+    "facilities": ["Projector"],
+    "isActive": true
+  },
+  {
+    "name": "EE 209",
+    "location": "K R Natu Building, 2nd floor",
+    "capacity": 100,
+    "facilities": ["Smart TV"],
+    "isActive": true
+  },
+  {
+    "name": "EE 101",
+    "location": "Electrical Engg Dept, First Floor Plan",
+    "capacity": 120,
+    "facilities": ["Projector"],
+    "isActive": true
+  },
+  {
+    "name": "EE 102",
+    "location": "Electrical Engg Dept, First Floor Plan",
+    "capacity": 50,
+    "facilities": ["Projector"],
+    "isActive": true
+  },
+  {
+    "name": "EE 103",
+    "location": "Electrical Engg Dept, First Floor Plan",
+    "capacity": 50,
+    "facilities": ["Projector"],
+    "isActive": true
+  },
+  {
+    "name": "EE 104",
+    "location": "Electrical Engg Dept, First Floor Plan",
+    "capacity": 105,
+    "facilities": ["Projector"],
+    "isActive": true
+  },
+  {
+    "name": "Conference Hall",
+    "location": "Electrical Engg Dept, First Floor Plan",
+    "capacity": 40,
+    "facilities": ["Projector"],
+    "isActive": true
+  },
+  {
+    "name": "Classroom Environment Lab",
+    "location": "Civil Engg Dept, 1st Floor (Environment Lab)",
+    "capacity": 25,
+    "facilities": ["Projector"],
+    "isActive": true
+  },
+  {
+    "name": "1st Floor (Civil Department)",
+    "location": "Civil Engg Dept, (Construction Managment)",
+    "capacity": 20,
+    "facilities": ["projector"],
+    "isActive": true
+  },
+  {
+    "name": "Room No.7",
+    "location": "Civil Engg Dept, Ground Floor",
+    "capacity": 60,
+    "facilities": ["projector", "wifi"],
+    "isActive": true
+  },
+  {
+    "name": "Room No. 8",
+    "location": "Civil Engg Dept, Ground Floor",
+    "capacity": 60,
+    "facilities": ["Projector", "wifi"],
+    "isActive": true
+  },
+  {
+    "name": "1st floor (Geotech classroom)",
+    "location": "Civil Engg Dept, (Transportation & Geotech)",
+    "capacity": 25,
+    "facilities": ["projector"],
+    "isActive": true
+  },
+  {
+    "name": "MM-001",
+    "location": "Metallurgy Department, Ground Floor",
+    "capacity": 70,
+    "facilities": [],
+    "isActive": true
+  },
+  {
+    "name": "MM-101",
+    "location": "Metallurgy Department, First Floor",
+    "capacity": 70,
+    "facilities": [],
+    "isActive": true
+  },
+  {
+    "name": "MM-201",
+    "location": "Metallurgy Department, 2nd Floor",
+    "capacity": 80,
+    "facilities": [],
+    "isActive": true
+  },
+  {
+    "name": "MM-301",
+    "location": "Metallurgy Department, 3rd Floor",
+    "capacity": 60,
+    "facilities": [],
+    "isActive": true
+  },
+  {
+    "name": "PG CLASSROOM MM-202",
+    "location": "Metallurgy Department, 3rd Floor",
+    "capacity": 50,
+    "facilities": [],
+    "isActive": true
+  },
+  {
+    "name": "MM-EXT-101",
+    "location": "Metallurgy Department, Newly Constructed Classrooms",
+    "capacity": 100,
+    "facilities": [],
+    "isActive": true
+  },
+  {
+    "name": "MM-EXT-102",
+    "location": "Metallurgy Department, Newly Constructed Classrooms",
+    "capacity": 20,
+    "facilities": [],
+    "isActive": true
+  },
+  {
+    "name": "MM-EXT-201",
+    "location": "Metallurgy Department, Newly Constructed Classrooms",
+    "capacity": 77,
+    "facilities": [],
+    "isActive": true
+  },
+  {
+    "name": "MM-EXT-SH1",
+    "location": "Metallurgy Department, 2nd Floor",
+    "capacity": 80,
+    "facilities": [],
+    "isActive": true
+  },
+  {
+    "name": "MM-EXT-301",
+    "location": "Metallurgy Department, 2nd Floor",
+    "capacity": 110,
+    "facilities": [],
+    "isActive": true
+  }
+]
