@@ -12,6 +12,8 @@ const bookingSchema = new mongoose.Schema(
             ref: "User",
             required: true
         },
+        eventName: { type: String, required: true, trim: true },
+        contactInfo: { type: String, required: true, trim: true },
         date: {
             type: Date,
             required: true
@@ -36,6 +38,7 @@ const bookingSchema = new mongoose.Schema(
             default: "PENDING"
         },
         studCount: { type: Number, required: true, min: 1 },
+        rejectionReason: { type: String, trim: true },
     },
     { timestamps: true }
 );

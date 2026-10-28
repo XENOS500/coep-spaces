@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 import Booking from "../models/bookings.js";
 import Venue from "../models/venue.js";
-import { validateBookingInput } from "../services/bookingValidationService";
-import { isVenueAvailable, getBookingsForDay } from "../services/availabilityService";
+import { validateBookingInput } from "../services/bookingValidationService.js";
+import { isVenueAvailable, getBookingsForDay } from "../services/availabilityService.js";
 
 
 //POST /api/booking
@@ -30,7 +30,7 @@ export const createBooking = async (req, res) => {
 // GET /api/bookings/my
 export const getMyBookings = async (req, res) => {
     try {
-        const bookings = await Booking.find({ requester: req.user.id }).populate('venue', 'name building').sort({ createdAt: -1 });
+        const bookings = await Booking.find({ requester: req.user.id }).populate('venue', 'name location').sort({ createdAt: -1 });
         res.json(bookings);
         res.json(bookings);
     } catch (err) {
