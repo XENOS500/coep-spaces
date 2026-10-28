@@ -8,6 +8,7 @@ import LoginPage from './pages/auth/LoginPage.jsx'
 import RegisterPage from './pages/auth/RegisterPage.jsx'
 import NotFound from './pages/NotFound.jsx'
 import VenueDetailsPage from './pages/venues/VenueDetailsPage.jsx'
+import MyBookingsPage from './pages/bookings/MyBookingsPage.jsx'
 
 function HomePage() {
   return (
@@ -110,6 +111,7 @@ function App() {
         <Route path="*" element={<NotFound />} />
         <Route path="/venues" element={<VenueCatalogPage />} />
         <Route path="/venue/:id" element={<VenueDetailsPage />} />
+        <Route path="/my-bookings" element={<MyBookingsPage />} />
       </Routes>
     </BrowserRouter>
   )
