@@ -65,7 +65,8 @@ export const cancelBooking = async (req, res) => {
         await booking.save();
         res.json(booking);
     } catch (err) {
-        res.status(500).json({ message: 'Server error' });
+    console.error("Cancel booking failed:", err);
+    return res.status(500).json({ message: "Server error" });
     }
 };
 // GET /api/bookings/venue/:venueId?date=2026-11-05
