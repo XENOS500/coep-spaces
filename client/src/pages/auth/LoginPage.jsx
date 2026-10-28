@@ -1,15 +1,33 @@
 
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("BOOKER");
+  const [error, setError] = useState("");
+
+  const navigate = useNavigate();
 
   function handleSubmit(event) {
-    event.preventDefault()
-    setError('Login is not connected to the backend yet.')
+    event.preventDefault();
+
+    if (!email.trim() || !password.trim()) {
+      setError("Please enter your email and password.");
+      return;
+    }
+
+    // Demo role selection only. Replace with backend authentication later.
+    setError("");
+
+    if (role === "ADMIN") {
+      navigate("/admin/venues");
+    } else if (role === "APPROVER") {
+      navigate("/approvals");
+    } else {
+      navigate("/venues");
+    }
   }
 
   return (
@@ -49,7 +67,7 @@ function LoginPage() {
           <p className="eyebrow">WELCOME BACK</p>
           <h2>Sign in</h2>
           <p className="auth-card-description">
-            Enter your account details to continue.
+            Enter your details and choose a demo role to continue.
           </p>
 
           <form onSubmit={handleSubmit}>
@@ -79,6 +97,19 @@ function LoginPage() {
               />
             </div>
 
+            <div className="form-field">
+              <label htmlFor="role">Continue as</label>
+              <select
+                id="role"
+                value={role}
+                onChange={(event) => setRole(event.target.value)}
+              >
+                <option value="BOOKER">Booker</option>
+                <option value="APPROVER">Approver</option>
+                <option value="ADMIN">Admin</option>
+              </select>
+            </div>
+
             {error && (
               <p className="auth-error" role="alert">
                 {error}
@@ -86,17 +117,22 @@ function LoginPage() {
             )}
 
             <button className="auth-submit" type="submit">
-              Sign in
+              Continue to dashboard
             </button>
           </form>
 
           <p className="auth-switch">
-            New to COEP Spaces? <Link to="/register">Create an account</Link>
+            New to COEP Spaces?{" "}
+            <Link to="/register">Create an account</Link>
+          </p>
+
+          <p className="demo-note">
+            Demo mode: role selection does not verify your identity.
           </p>
         </div>
       </section>
     </main>
-  )
+  );
 }
 
-export default LoginPage
+export default LoginPage;
