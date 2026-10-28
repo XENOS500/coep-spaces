@@ -44,12 +44,11 @@ export const updateApprovalStatus = async (req, res) => {
 
         if (status === "APPROVED") {
             const conflictingBooking = await Booking.findOne({
-                _id: { $ne: booking._id },
-                venue: booking.venue,
-                date: booking.date,
-                status: "APPROVED",
-                startTime: { $lt: booking.endTime },
-                endTime: { $gt: booking.startTime }
+            _id: { $ne: booking._id },
+            venue: booking.venue,
+            status: "APPROVED",
+            startTime: { $lt: booking.endTime },
+             endTime: { $gt: booking.startTime },
             });
 
             if (conflictingBooking) {

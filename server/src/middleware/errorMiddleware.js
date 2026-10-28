@@ -35,7 +35,7 @@ export const errorHandler = (err,req,res,next)=>{
         message = "Internal Server Error"
     }
     res.status(statusCode).json({
-        sucess:false,
+        success:false,
         message,
 
         ...(process.env.NODE_ENV !== "production"&&{
