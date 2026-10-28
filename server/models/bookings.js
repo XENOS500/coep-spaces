@@ -17,11 +17,11 @@ const bookingSchema = new mongoose.Schema(
             required: true
         },
         startTime: {
-            type: String,
+            type: Date,
             required: true
         },
         endTime: {
-            type: String,
+            type: Date,
             required: true
         },
         purpose: {
@@ -34,10 +34,13 @@ const bookingSchema = new mongoose.Schema(
             type: String,
             enum: ["PENDING", "APPROVED", "REJECTED"],
             default: "PENDING"
-        }
+        },
+        studCount: { type: Number, required: true, min: 1 },
     },
     { timestamps: true }
 );
+
+bookingSchema.index({ venue: 1, startTime: 1, endTime: 1 });
 
 const Booking = mongoose.model("Booking", bookingSchema);
 
