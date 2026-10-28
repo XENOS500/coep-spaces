@@ -6,6 +6,7 @@ import {
   getVenues,
   getBookings,
   saveBookings,
+  DEMO_APPROVERS,
 } from "../../data/demoStore.js";
 
 function formatDate(date) {
@@ -33,18 +34,15 @@ function ApprovalsPage() {
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [message, setMessage] = useState("");
 
-  // The login currently selects only the APPROVER role, not an individual.
-  // This selector lets us test each demo Approver until real login exists.
-  const approvers = [
-    "Dr. Kulkarni",
-    "Prof. Deshmukh",
-    "Dr. Patil",
-  ];
+  const [currentApprover, setCurrentApprover] = useState(() => {
+    const savedApprover = sessionStorage.getItem("demoApproverName");
 
-  const [currentApprover, setCurrentApprover] = useState(
-    () => sessionStorage.getItem("demoApproverName") || approvers[0]
-  );
+    return DEMO_APPROVERS.includes(savedApprover)
+      ? savedApprover
+      : DEMO_APPROVERS[0];
+  });
 
+  // Refresh shared data when another page changes venues or bookings.
   useEffect(() => {
     function refreshData() {
       setVenues(getVenues());
@@ -53,13 +51,20 @@ function ApprovalsPage() {
 
     window.addEventListener("focus", refreshData);
     window.addEventListener("pageshow", refreshData);
+    window.addEventListener("coep-demo-data-changed", refreshData);
+
+    // The storage event also handles changes made in another browser tab.
+    window.addEventListener("storage", refreshData);
 
     return () => {
       window.removeEventListener("focus", refreshData);
       window.removeEventListener("pageshow", refreshData);
+      window.removeEventListener("coep-demo-data-changed", refreshData);
+      window.removeEventListener("storage", refreshData);
     };
   }, []);
 
+  // Only show pending bookings for venues assigned to this Approver.
   const pendingBookings = bookings.filter((booking) => {
     if (booking.status !== "PENDING") return false;
 
@@ -73,23 +78,51 @@ function ApprovalsPage() {
   });
 
   function handleApproverChange(event) {
-    const name = event.target.value;
-    setCurrentApprover(name);
-    sessionStorage.setItem("demoApproverName", name);
+    const approver = event.target.value;
+
+    setCurrentApprover(approver);
+    sessionStorage.setItem("demoApproverName", approver);
     setMessage("");
   }
 
   function handleDecision(bookingId, decision) {
-    const updatedBookings = bookings.map((booking) =>
-      booking.id === bookingId
-        ? { ...booking, status: decision }
-        : booking
+    const booking = bookings.find((item) => item.id === bookingId);
+
+    if (!booking || booking.status !== "PENDING") {
+      setSelectedBooking(null);
+      setMessage("This booking has already been decided.");
+      return;
+    }
+
+    const venue = venues.find(
+      (item) =>
+        item.id === booking.venueId ||
+        (!booking.venueId && item.name === booking.venue)
     );
 
-    saveBookings(updatedBookings);
-    setBookings(updatedBookings);
-    setMessage(`Booking ${bookingId} marked ${decision.toLowerCase()}.`);
-    setSelectedBooking(null);
+    // Check the assignment again before applying the demo decision.
+    if (!venue || venue.approver !== currentApprover) {
+      setSelectedBooking(null);
+      setMessage("This booking is not assigned to the selected Approver.");
+      return;
+    }
+
+    const updatedBookings = bookings.map((item) =>
+      item.id === bookingId
+        ? { ...item, status: decision }
+        : item
+    );
+
+    try {
+      saveBookings(updatedBookings);
+      setBookings(updatedBookings);
+      setMessage(`Booking ${bookingId} marked ${decision.toLowerCase()}.`);
+      setSelectedBooking(null);
+
+      window.dispatchEvent(new Event("coep-demo-data-changed"));
+    } catch {
+      setMessage("Could not save this decision in the browser. Please retry.");
+    }
   }
 
   return (
@@ -127,14 +160,15 @@ function ApprovalsPage() {
             value={currentApprover}
             onChange={handleApproverChange}
           >
-            {approvers.map((approver) => (
+            {DEMO_APPROVERS.map((approver) => (
               <option key={approver} value={approver}>
                 {approver}
               </option>
             ))}
           </select>
           <span className="table-secondary">
-            Demo selector only; real identity will come from backend login.
+            Demo selector only. A real Approver identity must come from
+            backend authentication.
           </span>
         </div>
 
@@ -224,8 +258,9 @@ function ApprovalsPage() {
         )}
 
         <p className="approval-demo-note">
-          Demo mode: decisions are saved in this browser only. Backend
-          authorization and persistent approvals are not connected yet.
+          Demo mode: decisions are saved in this browser only. Real
+          authentication, server persistence and authorization require the
+          backend API.
         </p>
       </section>
 

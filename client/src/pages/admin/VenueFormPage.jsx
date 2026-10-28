@@ -1,50 +1,13 @@
 
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-
-const mockVenues = [
-  {
-    id: "venue-1",
-    name: "Main Auditorium",
-    type: "Auditorium",
-    capacity: 500,
-    building: "Main Building",
-    floor: "Ground Floor",
-    room: "Auditorium A",
-    image: "",
-    approver: "Dr. Kulkarni",
-  },
-  {
-    id: "venue-2",
-    name: "Seminar Hall 1",
-    type: "Seminar Hall",
-    capacity: 100,
-    building: "Academic Block",
-    floor: "First Floor",
-    room: "First Floor",
-    image: "",
-    approver: "Prof. Deshmukh",
-  },
-  {
-    id: "venue-3",
-    name: "Classroom B204",
-    type: "Classroom",
-    capacity: 60,
-    building: "Engineering Block B",
-    floor: "Second Floor",
-    room: "Room 204",
-    image: "",
-    approver: "Dr. Patil",
-  },
-];
-
-const approvers = [
-  "Dr. Kulkarni",
-  "Prof. Deshmukh",
-  "Dr. Patil",
-];
-
-
+import Navbar from "../../components/layout/Navbar.jsx";
+import Footer from "../../components/layout/Footer.jsx";
+import {
+  getVenues,
+  saveVenues,
+  DEMO_APPROVERS,
+} from "../../data/demoStore.js";
 
 const emptyVenue = {
   name: "",
@@ -62,18 +25,23 @@ function VenueFormPage() {
   const navigate = useNavigate();
   const isEditing = Boolean(id);
 
-  const existingVenue = mockVenues.find((venue) => venue.id === id);
-
-  const [formData, setFormData] = useState(
-    isEditing && existingVenue ? existingVenue : emptyVenue
+  const [existingVenue] = useState(() =>
+    isEditing ? getVenues().find((venue) => venue.id === id) : null
   );
+
+  const [formData, setFormData] = useState(() =>
+    existingVenue
+      ? { ...emptyVenue, ...existingVenue }
+      : { ...emptyVenue }
+  );
+
   const [error, setError] = useState("");
 
   function handleChange(event) {
     const { name, value } = event.target;
 
-    setFormData((previousData) => ({
-      ...previousData,
+    setFormData((previous) => ({
+      ...previous,
       [name]: value,
     }));
 
@@ -83,10 +51,15 @@ function VenueFormPage() {
   function handleSubmit(event) {
     event.preventDefault();
 
+    const name = formData.name.trim();
+    const building = formData.building.trim();
+    const room = formData.room.trim();
+    const capacity = Number(formData.capacity);
+
     if (
-      !formData.name.trim() ||
-      !formData.building.trim() ||
-      !formData.room.trim() ||
+      !name ||
+      !building ||
+      !room ||
       !formData.capacity ||
       !formData.approver
     ) {
@@ -94,29 +67,72 @@ function VenueFormPage() {
       return;
     }
 
-    if (Number(formData.capacity) < 1) {
-      setError("Capacity must be at least 1.");
+    if (!Number.isInteger(capacity) || capacity < 1) {
+      setError("Capacity must be a positive whole number.");
       return;
     }
 
-    // Demo only: the venue is not saved to the backend yet.
-    console.log(
-      isEditing ? "Demo venue update:" : "Demo new venue:",
-      formData
-    );
+    if (!DEMO_APPROVERS.includes(formData.approver)) {
+      setError("Please select a valid approver.");
+      return;
+    }
 
-    window.alert(
-      isEditing
-        ? "Demo: venue details validated."
-        : "Demo: new venue details validated."
-    );
+    const currentVenues = getVenues();
 
-    navigate("/admin/venues");
+    const updatedFields = {
+      ...formData,
+      name,
+      building,
+      room,
+      capacity,
+      floor: formData.floor.trim(),
+      image: formData.image.trim(),
+      approver: formData.approver,
+    };
+
+    let updatedVenues;
+
+    if (isEditing) {
+      const venueExists = currentVenues.some(
+        (venue) => venue.id === id
+      );
+
+      if (!venueExists) {
+        setError("This venue no longer exists. Return to venue management.");
+        return;
+      }
+
+      updatedVenues = currentVenues.map((venue) =>
+        venue.id === id
+          ? { ...venue, ...updatedFields, id: venue.id }
+          : venue
+      );
+    } else {
+      const newVenue = {
+        ...updatedFields,
+        id: `venue-${Date.now()}`,
+        active: true,
+      };
+
+      updatedVenues = [...currentVenues, newVenue];
+    }
+
+    try {
+      saveVenues(updatedVenues);
+
+      // Notify pages currently open in this tab that shared data changed.
+      window.dispatchEvent(new Event("coep-demo-data-changed"));
+
+      navigate("/admin/venues");
+    } catch {
+      setError("Could not save the venue in this browser. Please try again.");
+    }
   }
 
   if (isEditing && !existingVenue) {
     return (
       <main className="venue-form-page">
+        <Navbar />
         <section className="venue-form-card">
           <p className="eyebrow">COEP SPACES / ADMIN</p>
           <h1>Venue not found</h1>
@@ -128,20 +144,23 @@ function VenueFormPage() {
             Back to venues
           </Link>
         </section>
+        <Footer />
       </main>
     );
   }
 
   return (
     <main className="venue-form-page">
+      <Navbar />
+
       <div className="venue-form-heading">
         <div>
           <p className="eyebrow">COEP SPACES / ADMIN</p>
           <h1>{isEditing ? "Edit venue" : "Add a venue"}</h1>
           <p className="form-intro">
             {isEditing
-              ? "Update the details people see when booking this space."
-              : "Add a campus space to make it available for booking."}
+              ? "Update venue details or change its assigned Approver."
+              : "Add a campus space and assign the person responsible for approvals."}
           </p>
         </div>
 
@@ -194,6 +213,7 @@ function VenueFormPage() {
               name="capacity"
               type="number"
               min="1"
+              step="1"
               value={formData.capacity}
               onChange={handleChange}
               placeholder="e.g. 100"
@@ -262,7 +282,7 @@ function VenueFormPage() {
             required
           >
             <option value="">Select an approver</option>
-            {approvers.map((approver) => (
+            {DEMO_APPROVERS.map((approver) => (
               <option key={approver} value={approver}>
                 {approver}
               </option>
@@ -270,7 +290,11 @@ function VenueFormPage() {
           </select>
         </label>
 
-        {error && <p className="venue-form-error">{error}</p>}
+        {error && (
+          <p className="venue-form-error" role="alert">
+            {error}
+          </p>
+        )}
 
         <div className="venue-form-actions">
           <Link className="secondary-button" to="/admin/venues">
@@ -282,10 +306,12 @@ function VenueFormPage() {
         </div>
 
         <p className="demo-note">
-          Demo mode: this form validates your input but does not yet save
-          changes to the server.
+          Demo mode: venue details and assignments are saved in this
+          browser, not on the backend server.
         </p>
       </form>
+
+      <Footer />
     </main>
   );
 }
