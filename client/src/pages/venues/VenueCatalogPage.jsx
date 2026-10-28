@@ -1,0 +1,152 @@
+
+import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import Navbar from '../../components/layout/Navbar.jsx'
+import Footer from '../../components/layout/Footer.jsx'
+import { getVenues } from '../../data/demoStore.js'
+
+function VenueCatalogPage() {
+  const [allVenues, setAllVenues] = useState(() =>
+    getVenues().filter((v) => v.active)
+  )
+  const [search, setSearch] = useState('')
+  const [selectedType, setSelectedType] = useState('All venues')
+
+  useEffect(() => {
+    function handleStoreUpdate() {
+      setAllVenues(getVenues().filter((v) => v.active))
+    }
+
+    window.addEventListener('coepStoreUpdate', handleStoreUpdate)
+    return () => {
+      window.removeEventListener('coepStoreUpdate', handleStoreUpdate)
+    }
+  }, [])
+
+  const venueTypes = [
+    'All venues',
+    ...new Set(allVenues.map((venue) => venue.type)),
+  ]
+
+  const filteredVenues = allVenues.filter((venue) => {
+    const matchesSearch =
+      venue.name.toLowerCase().includes(search.toLowerCase()) ||
+      venue.building.toLowerCase().includes(search.toLowerCase())
+
+    const matchesType =
+      selectedType === 'All venues' || venue.type === selectedType
+
+    return matchesSearch && matchesType
+  })
+
+  return (
+    <main className="catalog-page">
+      <Navbar />
+
+      <section className="catalog-heading">
+        <p className="eyebrow">COEP / CAMPUS DIRECTORY</p>
+        <h1>Find your <span>space.</span></h1>
+        <p>
+          A place for lectures, discussions, workshops and the
+          ideas that bring people together.
+        </p>
+      </section>
+
+      <section className="catalog-controls">
+        <div className="catalog-search">
+          <label htmlFor="venue-search">Search campus spaces</label>
+          <input
+            id="venue-search"
+            type="search"
+            placeholder="Search by venue or building..."
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+        </div>
+
+        <div className="catalog-filter">
+          <label htmlFor="venue-type">Venue type</label>
+          <select
+            id="venue-type"
+            value={selectedType}
+            onChange={(event) => setSelectedType(event.target.value)}
+          >
+            {venueTypes.map((type) => (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            ))}
+          </select>
+        </div>
+      </section>
+
+      <section className="catalog-results">
+        <div className="catalog-results-heading">
+          <h2>Campus spaces</h2>
+          <p>
+            {filteredVenues.length}{' '}
+            {filteredVenues.length === 1 ? 'venue' : 'venues'} found
+          </p>
+        </div>
+
+        {filteredVenues.length > 0 ? (
+          <div className="venue-grid">
+            {filteredVenues.map((venue) => (
+              <article className="venue-card" key={venue.id}>
+                <img
+                  className="venue-card-image"
+                  src={venue.image || 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=900&q=80'}
+                  alt={venue.name}
+                  loading="lazy"
+                />
+
+                <div className="venue-card-body">
+                  <div className="venue-card-meta">
+                    <span>{venue.type}</span>
+                    <span>Capacity {venue.capacity}</span>
+                  </div>
+
+                  <h3>{venue.name}</h3>
+                  <p className="venue-location">{venue.building}</p>
+
+                  {venue.facilities && venue.facilities.length > 0 && (
+                    <div className="venue-facilities">
+                      {venue.facilities.slice(0, 3).map((facility) => (
+                        <span key={facility}>{facility}</span>
+                      ))}
+                    </div>
+                  )}
+
+                  <Link
+                    className="venue-card-link"
+                    to={`/venue/${venue.id}`}
+                  >
+                    View venue <span aria-hidden="true">↗</span>
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="catalog-empty">
+            <h3>No venues found</h3>
+            <p>Try another search term or select a different venue type.</p>
+            <button
+              type="button"
+              onClick={() => {
+                setSearch('')
+                setSelectedType('All venues')
+              }}
+            >
+              Clear filters
+            </button>
+          </div>
+        )}
+      </section>
+
+      <Footer />
+    </main>
+  )
+}
+
+export default VenueCatalogPage
