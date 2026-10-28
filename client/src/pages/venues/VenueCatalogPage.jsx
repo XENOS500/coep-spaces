@@ -1,82 +1,34 @@
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from '../../components/layout/Navbar.jsx'
 import Footer from '../../components/layout/Footer.jsx'
-
-const venues = [
-  {
-    id: 'main-auditorium',
-    name: 'Main Auditorium',
-    type: 'Auditorium',
-    building: 'Main Building',
-    capacity: 300,
-    facilities: ['Projector', 'Sound system', 'Stage'],
-    image:
-      'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=900&q=80',
-  },
-  {
-    id: 'seminar-hall-1',
-    name: 'Seminar Hall 1',
-    type: 'Seminar Hall',
-    building: 'Academic Complex',
-    capacity: 100,
-    facilities: ['Projector', 'Air conditioning'],
-    image:
-      'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=900&q=80',
-  },
-  {
-    id: 'computer-lab-2',
-    name: 'Computer Lab 2',
-    type: 'Laboratory',
-    building: 'Computer Science Department',
-    capacity: 60,
-    facilities: ['Computers', 'Wi-Fi', 'Projector'],
-    image:
-      'https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&w=900&q=80',
-  },
-  {
-    id: 'classroom-b204',
-    name: 'Classroom B204',
-    type: 'Classroom',
-    building: 'Academic Complex',
-    capacity: 70,
-    facilities: ['Whiteboard', 'Projector'],
-    image:
-      'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=900&q=80',
-  },
-  {
-    id: 'conference-room',
-    name: 'Conference Room',
-    type: 'Meeting Room',
-    building: 'Administration Block',
-    capacity: 20,
-    facilities: ['Display screen', 'Video conferencing'],
-    image:
-      'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=900&q=80',
-  },
-  {
-    id: 'open-lawn',
-    name: 'Central Open Lawn',
-    type: 'Open Space',
-    building: 'Central Campus',
-    capacity: 200,
-    facilities: ['Outdoor seating', 'Open-air events'],
-    image:
-      'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=900&q=80',
-  },
-]
-
-const venueTypes = [
-  'All venues',
-  ...new Set(venues.map((venue) => venue.type)),
-]
+import { getVenues } from '../../data/demoStore.js'
 
 function VenueCatalogPage() {
+  const [allVenues, setAllVenues] = useState(() =>
+    getVenues().filter((v) => v.active)
+  )
   const [search, setSearch] = useState('')
   const [selectedType, setSelectedType] = useState('All venues')
 
-  const filteredVenues = venues.filter((venue) => {
+  useEffect(() => {
+    function handleStoreUpdate() {
+      setAllVenues(getVenues().filter((v) => v.active))
+    }
+
+    window.addEventListener('coepStoreUpdate', handleStoreUpdate)
+    return () => {
+      window.removeEventListener('coepStoreUpdate', handleStoreUpdate)
+    }
+  }, [])
+
+  const venueTypes = [
+    'All venues',
+    ...new Set(allVenues.map((venue) => venue.type)),
+  ]
+
+  const filteredVenues = allVenues.filter((venue) => {
     const matchesSearch =
       venue.name.toLowerCase().includes(search.toLowerCase()) ||
       venue.building.toLowerCase().includes(search.toLowerCase())
@@ -143,7 +95,7 @@ function VenueCatalogPage() {
               <article className="venue-card" key={venue.id}>
                 <img
                   className="venue-card-image"
-                  src={venue.image}
+                  src={venue.image || 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=900&q=80'}
                   alt={venue.name}
                   loading="lazy"
                 />
@@ -157,11 +109,13 @@ function VenueCatalogPage() {
                   <h3>{venue.name}</h3>
                   <p className="venue-location">{venue.building}</p>
 
-                  <div className="venue-facilities">
-                    {venue.facilities.slice(0, 3).map((facility) => (
-                      <span key={facility}>{facility}</span>
-                    ))}
-                  </div>
+                  {venue.facilities && venue.facilities.length > 0 && (
+                    <div className="venue-facilities">
+                      {venue.facilities.slice(0, 3).map((facility) => (
+                        <span key={facility}>{facility}</span>
+                      ))}
+                    </div>
+                  )}
 
                   <Link
                     className="venue-card-link"

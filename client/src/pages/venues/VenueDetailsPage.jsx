@@ -3,85 +3,13 @@ import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import Navbar from '../../components/layout/Navbar.jsx'
 import Footer from '../../components/layout/Footer.jsx'
-
-const venues = [
-  {
-    id: 'main-auditorium',
-    name: 'Main Auditorium',
-    type: 'Auditorium',
-    building: 'Main Building',
-    floor: 'Ground Floor',
-    room: 'A001',
-    capacity: 300,
-    facilities: ['Projector', 'Sound system', 'Stage'],
-    image:
-      'https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=1200&q=80',
-  },
-  {
-    id: 'seminar-hall-1',
-    name: 'Seminar Hall 1',
-    type: 'Seminar Hall',
-    building: 'Academic Complex',
-    floor: 'First Floor',
-    room: 'S101',
-    capacity: 100,
-    facilities: ['Projector', 'Air conditioning'],
-    image:
-      'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=80',
-  },
-  {
-    id: 'computer-lab-2',
-    name: 'Computer Lab 2',
-    type: 'Laboratory',
-    building: 'Computer Science Department',
-    floor: 'Second Floor',
-    room: 'C202',
-    capacity: 60,
-    facilities: ['Computers', 'Wi-Fi', 'Projector'],
-    image:
-      'https://images.unsplash.com/photo-1581092921461-eab62e97a780?auto=format&fit=crop&w=1200&q=80',
-  },
-  {
-    id: 'classroom-b204',
-    name: 'Classroom B204',
-    type: 'Classroom',
-    building: 'Academic Complex',
-    floor: 'Second Floor',
-    room: 'B204',
-    capacity: 70,
-    facilities: ['Whiteboard', 'Projector'],
-    image:
-      'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=80',
-  },
-  {
-    id: 'conference-room',
-    name: 'Conference Room',
-    type: 'Meeting Room',
-    building: 'Administration Block',
-    floor: 'First Floor',
-    room: 'M105',
-    capacity: 20,
-    facilities: ['Display screen', 'Video conferencing'],
-    image:
-      'https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=80',
-  },
-  {
-    id: 'open-lawn',
-    name: 'Central Open Lawn',
-    type: 'Open Space',
-    building: 'Central Campus',
-    floor: 'Outdoor',
-    room: 'L001',
-    capacity: 200,
-    facilities: ['Outdoor seating', 'Open-air events'],
-    image:
-      'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=1200&q=80',
-  },
-]
+import { getVenues, getBookings, saveBookings, dispatchStoreEvent } from '../../data/demoStore.js'
 
 function VenueDetailsPage() {
   const { id } = useParams()
-  const venue = venues.find((item) => item.id === id)
+
+  const venues = getVenues()
+  const venue = venues.find((v) => v.id === id)
 
   const [bookingDate, setBookingDate] = useState('')
   const [startTime, setStartTime] = useState('')
@@ -93,9 +21,8 @@ function VenueDetailsPage() {
   const [status, setStatus] = useState('')
   const [error, setError] = useState('')
 
-  // Temporary role until authentication is connected.
-  const role = 'REQUESTER'
-  const canBook = role === 'REQUESTER'
+  const role = sessionStorage.getItem('demoRole') || 'BOOKER'
+  const canBook = role === 'BOOKER' || role === 'REQUESTER'
 
   if (!venue) {
     return (
@@ -156,7 +83,23 @@ function VenueDetailsPage() {
       return
     }
 
-    // Demo only: no booking is saved to the backend yet.
+    const newBooking = {
+      id: `BK-${Date.now()}`,
+      requester: sessionStorage.getItem('demoBookerName') || 'Demo Booker',
+      email: sessionStorage.getItem('demoBookerEmail') || 'booker@demo.com',
+      venueId: venue.id,
+      venue: venue.name,
+      date: bookingDate,
+      startTime,
+      endTime,
+      attendees: Number(attendees),
+      purpose,
+      status: 'PENDING',
+    }
+
+    const updated = [...getBookings(), newBooking]
+    saveBookings(updated)
+    dispatchStoreEvent()
     setStatus('pending')
   }
 
@@ -171,7 +114,10 @@ function VenueDetailsPage() {
 
         <section className="venue-detail-hero">
           <div className="venue-detail-image-wrap">
-            <img src={venue.image} alt={venue.name} />
+            <img
+              src={venue.image || 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1200&q=80'}
+              alt={venue.name}
+            />
             <span className="venue-type-label">{venue.type}</span>
           </div>
 
@@ -179,7 +125,9 @@ function VenueDetailsPage() {
             <p className="eyebrow">COEP / CAMPUS SPACE</p>
             <h1>{venue.name}</h1>
             <p className="venue-detail-location">
-              {venue.building} · {venue.floor} · Room {venue.room}
+              {venue.building}
+              {venue.floor ? ` · ${venue.floor}` : ''}
+              {venue.room ? ` · Room ${venue.room}` : ''}
             </p>
             <p className="venue-detail-description">
               Review the venue's facilities and capacity, check your
@@ -202,25 +150,31 @@ function VenueDetailsPage() {
             <span>BUILDING</span>
             <strong>{venue.building}</strong>
           </div>
-          <div>
-            <span>FLOOR</span>
-            <strong>{venue.floor}</strong>
-          </div>
-          <div>
-            <span>ROOM</span>
-            <strong>{venue.room}</strong>
-          </div>
+          {venue.floor && (
+            <div>
+              <span>FLOOR</span>
+              <strong>{venue.floor}</strong>
+            </div>
+          )}
+          {venue.room && (
+            <div>
+              <span>ROOM</span>
+              <strong>{venue.room}</strong>
+            </div>
+          )}
         </section>
 
-        <section className="venue-facilities-section">
-          <p className="eyebrow">WHAT'S INCLUDED</p>
-          <h2>Facilities</h2>
-          <div className="venue-detail-facilities">
-            {venue.facilities.map((facility) => (
-              <span key={facility}>{facility}</span>
-            ))}
-          </div>
-        </section>
+        {venue.facilities && venue.facilities.length > 0 && (
+          <section className="venue-facilities-section">
+            <p className="eyebrow">WHAT'S INCLUDED</p>
+            <h2>Facilities</h2>
+            <div className="venue-detail-facilities">
+              {venue.facilities.map((facility) => (
+                <span key={facility}>{facility}</span>
+              ))}
+            </div>
+          </section>
+        )}
 
         {canBook && !status && (
           <section className="booking-section">

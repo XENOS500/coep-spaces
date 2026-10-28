@@ -2888,3 +2888,13 @@ a {
 .venue-approver-link:hover {
   color: #a04d37;
 }
+
+.approval-approver-selector {
+  max-width: 360px;
+  margin: 20px 0 24px;
+}
+
+.approval-approver-selector .table-secondary {
+  font-size: 0.78rem;
+  line-height: 1.5;
+}

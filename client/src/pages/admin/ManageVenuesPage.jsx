@@ -1,48 +1,25 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../../components/layout/Navbar.jsx";
 import Footer from "../../components/layout/Footer.jsx";
-
-// Temporary demonstration data.
-// The backend will eventually provide these records.
-const initialVenues = [
-  {
-    id: "venue-1",
-    name: "Main Auditorium",
-    type: "Auditorium",
-    building: "Main Building",
-    room: "Auditorium A",
-    capacity: 500,
-    approver: "Dr. Kulkarni",
-    active: true,
-  },
-  {
-    id: "venue-2",
-    name: "Seminar Hall 1",
-    type: "Seminar Hall",
-    building: "Academic Block",
-    room: "First Floor",
-    capacity: 100,
-    approver: "Prof. Deshmukh",
-    active: true,
-  },
-  {
-    id: "venue-3",
-    name: "Classroom B204",
-    type: "Classroom",
-    building: "Engineering Block B",
-    room: "Room 204",
-    capacity: 60,
-    approver: "Dr. Patil",
-    active: false,
-  },
-];
+import { getVenues, saveVenues } from "../../data/demoStore.js";
 
 function ManageVenuesPage() {
-  const [venues, setVenues] = useState(initialVenues);
+  const [venues, setVenues] = useState(() => getVenues());
   const [filter, setFilter] = useState("ALL");
   const [selectedVenue, setSelectedVenue] = useState(null);
+
+  useEffect(() => {
+    function handleStoreUpdate() {
+      setVenues(getVenues());
+    }
+
+    window.addEventListener("coepStoreUpdate", handleStoreUpdate);
+    return () => {
+      window.removeEventListener("coepStoreUpdate", handleStoreUpdate);
+    };
+  }, []);
 
   const filteredVenues = venues.filter((venue) => {
     if (filter === "ACTIVE") return venue.active;
@@ -53,14 +30,12 @@ function ManageVenuesPage() {
   function handleDeactivate() {
     if (!selectedVenue) return;
 
-    setVenues((currentVenues) =>
-      currentVenues.map((venue) =>
-        venue.id === selectedVenue.id
-          ? { ...venue, active: false }
-          : venue
-      )
+    const updatedVenues = venues.map((venue) =>
+      venue.id === selectedVenue.id ? { ...venue, active: false } : venue
     );
 
+    setVenues(updatedVenues);
+    saveVenues(updatedVenues);
     setSelectedVenue(null);
   }
 

@@ -18,17 +18,23 @@ function LoginPage() {
       return;
     }
 
-    // Demo role selection only. Replace with backend authentication later.
-  // Demo role selection only; not secure authentication.
+    // Demo role selection only; not secure authentication.
     sessionStorage.setItem("demoRole", role);
+    sessionStorage.setItem("demoBookerEmail", email);
+    sessionStorage.setItem("demoBookerName", email.split("@")[0]);
+
+    if (role === "APPROVER") {
+      sessionStorage.setItem("demoApproverName", email.split("@")[0]);
+    }
+
     setError("");
 
     if (role === "ADMIN") {
-    navigate("/admin/venues");
+      navigate("/admin/venues");
     } else if (role === "APPROVER") {
-    navigate("/approvals");
+      navigate("/approvals");
     } else {
-    navigate("/venues");
+      navigate("/venues");
     }
   }
 
