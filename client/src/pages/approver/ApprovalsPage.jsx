@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import Navbar from "../../components/layout/Navbar.jsx";
+
 import Footer from "../../components/layout/Footer.jsx";
 import { fetchApprovals, decideBooking } from "../../services/bookingApi.js";
 import { formatDate, formatTime } from "../../services/dates.js";
@@ -52,7 +52,7 @@ function ApprovalsPage() {
 
   return (
     <main className="approvals-page">
-      <Navbar />
+
 
       <section className="approvals-heading">
         <p className="eyebrow">COEP / APPROVER DESK</p>

@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import Navbar from "../../components/layout/Navbar.jsx";
 import Footer from "../../components/layout/Footer.jsx";
 import { fetchAdminVenues, setVenueActive, promoteApprover } from "../../services/venueApi.js";
 
@@ -61,7 +60,7 @@ function ManageVenuesPage() {
 
   return (
     <main className="manage-venues-page">
-      <Navbar />
+
 
       <section className="manage-venues-heading">
         <p className="eyebrow">COEP / ADMINISTRATION</p>

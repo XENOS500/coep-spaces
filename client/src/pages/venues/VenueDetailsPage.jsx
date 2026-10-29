@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import Navbar from '../../components/layout/Navbar.jsx'
+
 import Footer from '../../components/layout/Footer.jsx'
 import { fetchVenue } from '../../services/venueApi.js'
 import { createBooking, checkAvailability as fetchAvailability } from '../../services/bookingApi.js'
@@ -97,7 +97,7 @@ function VenueDetailsPage() {
   if (venueLoading || venueError) {
     return (
       <main className="venue-detail-page">
-        <Navbar />
+
         <section className="venue-not-found" aria-live="polite">
           {venueLoading ? <p>Loading venue...</p> : (
             <>
@@ -116,7 +116,7 @@ function VenueDetailsPage() {
   if (!venue) {
     return (
       <main className="venue-detail-page">
-        <Navbar />
+
         <section className="venue-not-found">
           <p className="eyebrow">VENUE DIRECTORY</p>
           <h1>We couldn't find that space.</h1>
@@ -132,7 +132,7 @@ function VenueDetailsPage() {
 
   return (
     <main className="venue-detail-page">
-      <Navbar />
+
 
       <div className="venue-detail-container">
         <Link to="/venues" className="back-to-venues">

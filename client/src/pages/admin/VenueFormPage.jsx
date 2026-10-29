@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import Navbar from "../../components/layout/Navbar.jsx";
+
 import Footer from "../../components/layout/Footer.jsx";
 import { fetchApprovers, fetchAdminVenue, saveVenue } from "../../services/venueApi.js";
 
@@ -86,7 +86,7 @@ function VenueFormPage() {
   }
 
   if (loading || loadError) {
-    return <main className="venue-form-page"><Navbar /><section className="venue-form-card">
+    return <main className="venue-form-page"><section className="venue-form-card">
       {loading ? <p role="status">Loading venue details...</p> : <p role="alert">{loadError}</p>}
       <Link to="/admin/venues">Back to venues</Link>
     </section><Footer /></main>;
@@ -94,7 +94,7 @@ function VenueFormPage() {
 
   return (
     <main className="venue-form-page">
-      <Navbar />
+
 
       <div className="venue-form-heading">
         <div>

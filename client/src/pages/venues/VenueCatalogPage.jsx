@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import Navbar from '../../components/layout/Navbar.jsx'
 import Footer from '../../components/layout/Footer.jsx'
 import { fetchVenues } from '../../services/venueApi.js'
 
@@ -51,7 +50,7 @@ function VenueCatalogPage() {
   if (loading || error) {
     return (
       <main className="catalog-page">
-        <Navbar />
+
         <section className="catalog-results" aria-live="polite">
           {loading ? <p>Loading venues...</p> : <p role="alert">{error}</p>}
         </section>
@@ -62,7 +61,7 @@ function VenueCatalogPage() {
 
   return (
     <main className="catalog-page">
-      <Navbar />
+
 
       <section className="catalog-heading">
         <p className="eyebrow">COEP / CAMPUS DIRECTORY</p>

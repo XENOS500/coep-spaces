@@ -1,7 +1,6 @@
 
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import Navbar from '../../components/layout/Navbar.jsx'
 import Footer from '../../components/layout/Footer.jsx'
 import { fetchMyBookings, cancelBooking } from '../../services/bookingApi.js'
 import { formatDate, formatTime } from '../../services/dates.js'
@@ -59,7 +58,7 @@ function MyBookingsPage() {
 
   return (
     <main className="my-bookings-page">
-      <Navbar />
+
 
       <section className="bookings-heading">
         <p className="eyebrow">COEP / YOUR ACTIVITY</p>
