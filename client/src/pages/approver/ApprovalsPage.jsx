@@ -2,127 +2,52 @@
 import { useEffect, useState } from "react";
 import Navbar from "../../components/layout/Navbar.jsx";
 import Footer from "../../components/layout/Footer.jsx";
-import {
-  getVenues,
-  getBookings,
-  saveBookings,
-  DEMO_APPROVERS,
-} from "../../data/demoStore.js";
-
-function formatDate(date) {
-  return new Date(`${date}T00:00:00`).toLocaleDateString("en-IN", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
-
-function formatTime(time) {
-  const [hours, minutes] = time.split(":");
-  const date = new Date();
-  date.setHours(Number(hours), Number(minutes), 0, 0);
-
-  return date.toLocaleTimeString("en-IN", {
-    hour: "numeric",
-    minute: "2-digit",
-  });
-}
+import { fetchApprovals, decideBooking } from "../../services/bookingApi.js";
+import { formatDate, formatTime } from "../../services/dates.js";
 
 function ApprovalsPage() {
-  const [venues, setVenues] = useState(() => getVenues());
-  const [bookings, setBookings] = useState(() => getBookings());
+  const [bookings, setBookings] = useState([]);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
 
-  const [currentApprover, setCurrentApprover] = useState(() => {
-    const savedApprover = sessionStorage.getItem("demoApproverName");
-
-    return DEMO_APPROVERS.includes(savedApprover)
-      ? savedApprover
-      : DEMO_APPROVERS[0];
-  });
-
-  // Refresh shared data when another page changes venues or bookings.
   useEffect(() => {
-    function refreshData() {
-      setVenues(getVenues());
-      setBookings(getBookings());
+    const controller = new AbortController();
+    async function refresh() {
+      try {
+        const result = await fetchApprovals(controller.signal);
+        if (!controller.signal.aborted) { setBookings(result); setError(""); }
+      } catch (err) { if (!controller.signal.aborted) setError(err.message); }
+      finally { if (!controller.signal.aborted) setLoading(false); }
     }
-
-    window.addEventListener("focus", refreshData);
-    window.addEventListener("pageshow", refreshData);
-    window.addEventListener("coep-demo-data-changed", refreshData);
-
-    // The storage event also handles changes made in another browser tab.
-    window.addEventListener("storage", refreshData);
-
-    return () => {
-      window.removeEventListener("focus", refreshData);
-      window.removeEventListener("pageshow", refreshData);
-      window.removeEventListener("coep-demo-data-changed", refreshData);
-      window.removeEventListener("storage", refreshData);
-    };
+    refresh();
+    window.addEventListener("focus", refresh);
+    return () => { controller.abort(); window.removeEventListener("focus", refresh); };
   }, []);
 
-  // Only show pending bookings for venues assigned to this Approver.
-  const pendingBookings = bookings.filter((booking) => {
-    if (booking.status !== "PENDING") return false;
+  const pendingBookings = bookings;
 
-    const venue = venues.find(
-      (item) =>
-        item.id === booking.venueId ||
-        (!booking.venueId && item.name === booking.venue)
-    );
-
-    return venue && venue.approver === currentApprover;
-  });
-
-  function handleApproverChange(event) {
-    const approver = event.target.value;
-
-    setCurrentApprover(approver);
-    sessionStorage.setItem("demoApproverName", approver);
+  async function handleDecision(bookingId, decision) {
+    if (saving) return;
+    setSaving(true);
+    setError("");
     setMessage("");
-  }
-
-  function handleDecision(bookingId, decision) {
-    const booking = bookings.find((item) => item.id === bookingId);
-
-    if (!booking || booking.status !== "PENDING") {
-      setSelectedBooking(null);
-      setMessage("This booking has already been decided.");
-      return;
-    }
-
-    const venue = venues.find(
-      (item) =>
-        item.id === booking.venueId ||
-        (!booking.venueId && item.name === booking.venue)
-    );
-
-    // Check the assignment again before applying the demo decision.
-    if (!venue || venue.approver !== currentApprover) {
-      setSelectedBooking(null);
-      setMessage("This booking is not assigned to the selected Approver.");
-      return;
-    }
-
-    const updatedBookings = bookings.map((item) =>
-      item.id === bookingId
-        ? { ...item, status: decision }
-        : item
-    );
-
     try {
-      saveBookings(updatedBookings);
-      setBookings(updatedBookings);
-      setMessage(`Booking ${bookingId} marked ${decision.toLowerCase()}.`);
+      await decideBooking(bookingId, decision, rejectionReason);
+      setBookings(current => current.filter(item => item.id !== bookingId));
       setSelectedBooking(null);
-
-      window.dispatchEvent(new Event("coep-demo-data-changed"));
-    } catch {
-      setMessage("Could not save this decision in the browser. Please retry.");
-    }
+      setRejectionReason("");
+      setMessage("Booking " + decision.toLowerCase() + " successfully.");
+    } catch (err) {
+      setError(err.message);
+      if (err.status === 409 || err.status === 403) {
+        setSelectedBooking(null);
+        try { setBookings(await fetchApprovals()); } catch { /* Keep the original decision error visible. */ }
+      }
+    } finally { setSaving(false); }
   }
 
   return (
@@ -144,7 +69,7 @@ function ApprovalsPage() {
         <div className="approvals-topline">
           <div>
             <h2>Pending requests</h2>
-            <p>Requests assigned to the selected demo Approver.</p>
+            <p>Requests for venues assigned to your account.</p>
           </div>
 
           <div className="pending-count">
@@ -153,32 +78,16 @@ function ApprovalsPage() {
           </div>
         </div>
 
-        <div className="form-field approval-approver-selector">
-          <label htmlFor="demo-approver">Test as Approver</label>
-          <select
-            id="demo-approver"
-            value={currentApprover}
-            onChange={handleApproverChange}
-          >
-            {DEMO_APPROVERS.map((approver) => (
-              <option key={approver} value={approver}>
-                {approver}
-              </option>
-            ))}
-          </select>
-          <span className="table-secondary">
-            Demo selector only. A real Approver identity must come from
-            backend authentication.
-          </span>
-        </div>
 
+        {loading && <p role="status">Loading requests...</p>}
+        {error && <p role="alert">{error}</p>}
         {message && (
           <p className="approval-message" role="status">
             {message}
           </p>
         )}
 
-        {pendingBookings.length > 0 ? (
+        {!loading && !error && (pendingBookings.length > 0 ? (
           <div className="approvals-table-wrapper">
             <table className="approvals-table">
               <thead>
@@ -202,6 +111,7 @@ function ApprovalsPage() {
 
                     <td>
                       <strong>{booking.venue}</strong>
+                      <span className="table-secondary">{booking.eventName}</span>
                       <span className="table-secondary">{booking.purpose}</span>
                     </td>
 
@@ -253,15 +163,10 @@ function ApprovalsPage() {
           <div className="approvals-empty">
             <span className="empty-mark">✓</span>
             <h3>All caught up.</h3>
-            <p>No pending requests are assigned to {currentApprover}.</p>
+            <p>No pending requests are assigned to you.</p>
           </div>
-        )}
+        ))}
 
-        <p className="approval-demo-note">
-          Demo mode: decisions are saved in this browser only. Real
-          authentication, server persistence and authorization require the
-          backend API.
-        </p>
       </section>
 
       <Footer />
@@ -269,7 +174,7 @@ function ApprovalsPage() {
       {selectedBooking && (
         <div
           className="approval-dialog-backdrop"
-          onClick={() => setSelectedBooking(null)}
+          onClick={() => { if (!saving) { setSelectedBooking(null); setRejectionReason(""); } }}
         >
           <section
             className="approval-dialog"
@@ -297,11 +202,17 @@ function ApprovalsPage() {
               <strong>{formatDate(selectedBooking.date)}</strong>.
             </p>
 
+            {error && <p role="alert">{error}</p>}
+            {selectedBooking.decision === "REJECTED" && (
+              <label className="form-field">Reason (optional)
+                <textarea value={rejectionReason} onChange={event => setRejectionReason(event.target.value)} disabled={saving} />
+              </label>
+            )}
             <div className="approval-dialog-actions">
               <button
                 type="button"
                 className="dialog-cancel-button"
-                onClick={() => setSelectedBooking(null)}
+                onClick={() => { if (!saving) { setSelectedBooking(null); setRejectionReason(""); } }}
               >
                 Go back
               </button>
@@ -313,6 +224,7 @@ function ApprovalsPage() {
                     ? "dialog-reject-button"
                     : "dialog-confirm-button"
                 }
+                disabled={saving}
                 onClick={() =>
                   handleDecision(
                     selectedBooking.id,
@@ -320,7 +232,7 @@ function ApprovalsPage() {
                   )
                 }
               >
-                {selectedBooking.decision === "REJECTED"
+                {saving ? "Saving..." : selectedBooking.decision === "REJECTED"
                   ? "Confirm rejection"
                   : "Confirm approval"}
               </button>

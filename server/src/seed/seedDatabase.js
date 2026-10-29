@@ -1,11 +1,10 @@
 import mongoose from "mongoose";
 import connectDB from "../config/db.js";
-import Venue from "../models/venue.js";
+import { seedVenues } from "./seedVenues.js";
 import venues from "./venues.json" with { type: "json" };
 
 const seedDatabase = async () => {
   try {
-    await connectDB();
     const invalidVenues = venues.filter(
       (venue) => !Number.isFinite(venue.capacity) || venue.capacity < 1,
     );
@@ -15,14 +14,18 @@ const seedDatabase = async () => {
       invalidVenues.forEach((venue) => {
         console.error(`- ${venue.name}: ${venue.capacity}`);
       });
+      process.exitCode = 1;
       return;
     }
 
-    await Venue.insertMany(venues);
+    await connectDB();
 
-    console.log(`${venues.length} venues inserted successfully.`);
+    await seedVenues(venues);
+
+    console.log(`${venues.length} venues seeded successfully.`);
   } catch (error) {
     console.error("Database seeding failed:", error.message);
+    process.exitCode = 1;
   } finally {
     await mongoose.disconnect();
     console.log("MongoDB connection closed.");

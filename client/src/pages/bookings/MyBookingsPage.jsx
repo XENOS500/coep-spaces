@@ -3,56 +3,47 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from '../../components/layout/Navbar.jsx'
 import Footer from '../../components/layout/Footer.jsx'
-import { getBookings } from '../../data/demoStore.js'
+import { fetchMyBookings, cancelBooking } from '../../services/bookingApi.js'
+import { formatDate, formatTime } from '../../services/dates.js'
 
-const filters = ['ALL', 'PENDING', 'APPROVED', 'REJECTED']
-
-function formatDate(date) {
-  return new Date(`${date}T00:00:00`).toLocaleDateString('en-IN', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })
-}
-
-function formatTime(time) {
-  const [hours, minutes] = time.split(':')
-  const date = new Date()
-  date.setHours(Number(hours), Number(minutes), 0, 0)
-
-  return date.toLocaleTimeString('en-IN', {
-    hour: 'numeric',
-    minute: '2-digit',
-  })
-}
+const filters = ['ALL', 'PENDING', 'APPROVED', 'REJECTED', 'CANCELLED']
 
 function MyBookingsPage() {
-  const [bookings, setBookings] = useState(() => getBookings())
+  const [bookings, setBookings] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [cancelling, setCancelling] = useState('')
   const [selectedFilter, setSelectedFilter] = useState('ALL')
 
   useEffect(() => {
-    function refreshBookings() {
-      setBookings(getBookings())
+    const controller = new AbortController()
+    async function refreshBookings() {
+      try {
+        setError('')
+        const result = await fetchMyBookings(controller.signal)
+        if (!controller.signal.aborted) setBookings(result)
+      } catch (err) {
+        if (!controller.signal.aborted) setError(err.message)
+      } finally {
+        if (!controller.signal.aborted) setLoading(false)
+      }
     }
-
+    refreshBookings()
     window.addEventListener('focus', refreshBookings)
-    window.addEventListener('pageshow', refreshBookings)
-    window.addEventListener('coep-demo-data-changed', refreshBookings)
-    window.addEventListener('storage', refreshBookings)
-
-    return () => {
-      window.removeEventListener('focus', refreshBookings)
-      window.removeEventListener('pageshow', refreshBookings)
-      window.removeEventListener('coep-demo-data-changed', refreshBookings)
-      window.removeEventListener('storage', refreshBookings)
-    }
+    return () => { controller.abort(); window.removeEventListener('focus', refreshBookings) }
   }, [])
 
-  // Filter by the demo Booker identity when one is set.
-  const currentEmail = sessionStorage.getItem('demoBookerEmail')
-  const myBookings = currentEmail
-    ? bookings.filter((booking) => booking.email === currentEmail)
-    : bookings
+  async function handleCancel(id) {
+    if (cancelling) return
+    setCancelling(id)
+    setError('')
+    try {
+      const updated = await cancelBooking(id)
+      setBookings(current => current.map(booking => booking.id === id ? updated : booking))
+    } catch (err) { setError(err.message) }
+    finally { setCancelling('') }
+  }
+  const myBookings = bookings
 
   const filteredBookings = myBookings.filter((booking) => {
     return selectedFilter === 'ALL' || booking.status === selectedFilter
@@ -123,7 +114,9 @@ function MyBookingsPage() {
         </div>
 
         <div className="my-bookings-list">
-          {filteredBookings.length > 0 ? (
+          {error && <p role="alert">{error}</p>}
+          {loading && <p role="status">Loading bookings...</p>}
+          {!loading && !error && (filteredBookings.length > 0 ? (
             filteredBookings.map((booking) => (
               <article className="my-booking-card" key={booking.id}>
                 <div className="my-booking-main">
@@ -131,6 +124,7 @@ function MyBookingsPage() {
                     <div>
                       <p className="booking-reference">{booking.id}</p>
                       <h3>{booking.venue}</h3>
+                      <p>{booking.eventName}</p>
                     </div>
 
                     <span
@@ -141,6 +135,12 @@ function MyBookingsPage() {
                     </span>
                   </div>
 
+                  {['PENDING', 'APPROVED'].includes(booking.status) && new Date(booking.startTime) > new Date() && (
+                    <button className="booking-secondary-button" type="button" disabled={Boolean(cancelling)} onClick={() => handleCancel(booking.id)}>
+                      {cancelling === booking.id ? 'Cancelling...' : 'Cancel booking'}
+                    </button>
+                  )}
+                  {booking.rejectionReason && <p>Reason: {booking.rejectionReason}</p>}
                   <p className="my-booking-purpose">{booking.purpose}</p>
 
                   <div className="my-booking-details">
@@ -174,13 +174,9 @@ function MyBookingsPage() {
                 Browse venues
               </Link>
             </div>
-          )}
+          ))}
         </div>
 
-        <p className="demo-data-note">
-          Demo mode: bookings are read from browser storage. Real
-          accounts and server persistence require backend integration.
-        </p>
       </section>
 
       <Footer />

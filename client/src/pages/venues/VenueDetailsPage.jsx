@@ -1,19 +1,22 @@
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import Navbar from '../../components/layout/Navbar.jsx'
 import Footer from '../../components/layout/Footer.jsx'
-import {
-  getVenues,
-  getBookings,
-  saveBookings,
-  dispatchStoreEvent,
-} from '../../data/demoStore.js'
+import { fetchVenue } from '../../services/venueApi.js'
+import { createBooking, checkAvailability as fetchAvailability } from '../../services/bookingApi.js'
+import { useAuth } from '../../services/authContext.js'
+import { campusTimestamp, campusToday } from '../../services/dates.js'
 
 function VenueDetailsPage() {
   const { id } = useParams()
-  const venue = getVenues().find((item) => item.id === id)
+  const [venue, setVenue] = useState(null)
+  const [venueLoading, setVenueLoading] = useState(true)
+  const [venueError, setVenueError] = useState('')
 
+  const [eventName, setEventName] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [checking, setChecking] = useState(false)
   const [bookingDate, setBookingDate] = useState('')
   const [startTime, setStartTime] = useState('')
   const [endTime, setEndTime] = useState('')
@@ -24,136 +27,90 @@ function VenueDetailsPage() {
   const [status, setStatus] = useState('')
   const [error, setError] = useState('')
 
-  const role = sessionStorage.getItem('demoRole') || 'BOOKER'
-  const canBook = role === 'BOOKER' || role === 'REQUESTER'
+  useEffect(() => {
+    const controller = new AbortController()
 
-  function checkAvailability() {
-    setError('')
-    setAvailability('')
-
-    if (!bookingDate || !startTime || !endTime) {
-      setError('Choose a date, start time and end time first.')
-      return
+    async function loadVenue() {
+      try {
+        setVenueLoading(true)
+        setVenueError('')
+        setVenue(null)
+        setAvailability('')
+        setStatus('')
+        setError('')
+        const result = await fetchVenue(id, controller.signal)
+        if (!controller.signal.aborted) setVenue(result)
+      } catch (err) {
+        if (!controller.signal.aborted) setVenueError(err.message)
+      } finally {
+        if (!controller.signal.aborted) setVenueLoading(false)
+      }
     }
 
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
+    loadVenue()
+    return () => controller.abort()
+  }, [id])
 
-    const selectedDate = new Date(`${bookingDate}T00:00:00`)
+  const { user } = useAuth()
+  const canBook = user?.role === 'REQUESTER'
+  const currentSlot = JSON.stringify([id, bookingDate, startTime, endTime])
+  const slotAvailable = availability?.slot === currentSlot && availability.available
 
-    if (selectedDate < today) {
-      setError('Choose today or a future date.')
-      return
-    }
-
-    if (startTime >= endTime) {
-      setError('End time must be later than start time.')
-      return
-    }
-
-    const currentBookings = getBookings()
-
-    const hasConflict = currentBookings.some((booking) => {
-      const sameVenue =
-        booking.venueId === venue.id ||
-        (!booking.venueId && booking.venue === venue.name)
-
-      const sameDate = booking.date === bookingDate
-      const stillReserved =
-        booking.status === 'PENDING' || booking.status === 'APPROVED'
-
-      const overlaps =
-        startTime < booking.endTime && endTime > booking.startTime
-
-      return sameVenue && sameDate && stillReserved && overlaps
-    })
-
-    if (hasConflict) {
-      setError(
-        'This time overlaps an existing pending or approved demo booking. Try another slot.'
-      )
-      return
-    }
-
-    // Frontend demo check only; the backend must perform the real check.
-    setAvailability('demo-available')
+  function times() {
+    if (!bookingDate || !startTime || !endTime) throw new Error('Choose a date, start time and end time.')
+    const start = campusTimestamp(bookingDate, startTime)
+    const end = campusTimestamp(bookingDate, endTime)
+    if (new Date(start) <= new Date()) throw new Error('Choose a future start time.')
+    if (start >= end) throw new Error('End time must be later than start time.')
+    return { start, end }
   }
 
-  function handleSubmit(event) {
-    event.preventDefault()
+  async function checkAvailability() {
+    if (checking) return
     setError('')
-
-    if (!venue.active && venue.active !== undefined) {
-      setError('This venue is inactive and cannot be booked.')
-      return
-    }
-
-    if (availability !== 'demo-available') {
-      setError('Check availability before submitting your request.')
-      return
-    }
-
-    const attendeeCount = Number(attendees)
-
-    if (
-      !Number.isInteger(attendeeCount) ||
-      attendeeCount < 1 ||
-      attendeeCount > Number(venue.capacity)
-    ) {
-      setError(`Attendees must be a whole number between 1 and ${venue.capacity}.`)
-      return
-    }
-
-    if (!purpose.trim() || !contact.trim()) {
-      setError('Enter the event purpose and contact information.')
-      return
-    }
-
-    const currentBookings = getBookings()
-
-    // Recheck to avoid using an outdated availability result.
-    const hasConflict = currentBookings.some((booking) => {
-      const sameVenue =
-        booking.venueId === venue.id ||
-        (!booking.venueId && booking.venue === venue.name)
-
-      return (
-        sameVenue &&
-        booking.date === bookingDate &&
-        (booking.status === 'PENDING' || booking.status === 'APPROVED') &&
-        startTime < booking.endTime &&
-        endTime > booking.startTime
-      )
-    })
-
-    if (hasConflict) {
-      setAvailability('')
-      setError('This time slot is no longer available in the demo data.')
-      return
-    }
-
-    const newBooking = {
-      id: `BK-${Date.now()}`,
-      requester: sessionStorage.getItem('demoBookerName') || 'Demo Booker',
-      email: sessionStorage.getItem('demoBookerEmail') || 'booker@demo.com',
-      contact: contact.trim(),
-      venueId: venue.id,
-      venue: venue.name,
-      date: bookingDate,
-      startTime,
-      endTime,
-      attendees: attendeeCount,
-      purpose: purpose.trim(),
-      status: 'PENDING',
-    }
-
+    setAvailability(null)
+    setChecking(true)
     try {
-      saveBookings([...currentBookings, newBooking])
-      dispatchStoreEvent()
+      const { start, end } = times()
+      const result = await fetchAvailability(id, start, end)
+      setAvailability({ slot: currentSlot, available: result.available })
+    } catch (err) { setError(err.message) }
+    finally { setChecking(false) }
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault()
+    if (submitting) return
+    setError('')
+    setSubmitting(true)
+    try {
+      const { start, end } = times()
+      await createBooking({
+        venueId: id, eventName: eventName.trim(), purpose: purpose.trim(),
+        contactInfo: contact.trim(), studCount: Number(attendees), startTime: start, endTime: end,
+      })
       setStatus('pending')
-    } catch {
-      setError('Could not save the demo booking in this browser. Please try again.')
-    }
+    } catch (err) { setAvailability(null); setError(err.message) }
+    finally { setSubmitting(false) }
+  }
+
+  if (venueLoading || venueError) {
+    return (
+      <main className="venue-detail-page">
+        <Navbar />
+        <section className="venue-not-found" aria-live="polite">
+          {venueLoading ? <p>Loading venue...</p> : (
+            <>
+              <p role="alert">{venueError}</p>
+              <Link className="booking-primary-link" to="/venues">
+                Return to venues
+              </Link>
+            </>
+          )}
+        </section>
+        <Footer />
+      </main>
+    )
   }
 
   if (!venue) {
@@ -184,13 +141,10 @@ function VenueDetailsPage() {
 
         <section className="venue-detail-hero">
           <div className="venue-detail-image-wrap">
-            <img
-              src={
-                venue.image ||
-                'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1200&q=80'
-              }
+            {venue.image ? <img
+              src={venue.image}
               alt={venue.name}
-            />
+            /> : <div className="venue-photo-placeholder venue-detail-photo-placeholder" aria-label="No venue photo available">Photo not added</div>}
             <span className="venue-type-label">{venue.type}</span>
           </div>
 
@@ -267,12 +221,16 @@ function VenueDetailsPage() {
             ) : (
               <form className="booking-form" onSubmit={handleSubmit}>
                 <div className="booking-form-grid">
+                  <div className="form-field booking-full-width">
+                    <label htmlFor="eventName">Event name</label>
+                    <input id="eventName" value={eventName} onChange={event => setEventName(event.target.value)} required />
+                  </div>
                   <div className="form-field">
                     <label htmlFor="bookingDate">Booking date</label>
                     <input
                       id="bookingDate"
                       type="date"
-                      min={new Date().toLocaleDateString('en-CA')}
+                      min={campusToday()}
                       value={bookingDate}
                       onChange={(event) => {
                         setBookingDate(event.target.value)
@@ -333,6 +291,7 @@ function VenueDetailsPage() {
                     <textarea
                       id="purpose"
                       rows="3"
+                      maxLength={300}
                       placeholder="e.g. Technical workshop, seminar or club event"
                       value={purpose}
                       onChange={(event) => setPurpose(event.target.value)}
@@ -363,9 +322,7 @@ function VenueDetailsPage() {
                   <div>
                     <h3>Availability</h3>
                     <p>
-                      {availability === 'demo-available'
-                        ? 'Demo result: this slot is marked available.'
-                        : 'Choose a date and time, then check your slot.'}
+                      {slotAvailable ? 'This slot is currently available.' : availability?.slot === currentSlot && availability.available === false ? 'This slot is already reserved. Choose another time.' : 'Choose a date and time, then check your slot.'}
                     </p>
                   </div>
 
@@ -373,19 +330,20 @@ function VenueDetailsPage() {
                     className="booking-secondary-button"
                     type="button"
                     onClick={checkAvailability}
+                    disabled={checking || submitting}
                   >
-                    Check availability
+                    {checking ? 'Checking...' : 'Check availability'}
                   </button>
                 </div>
 
-                {availability === 'demo-available' && (
+                {slotAvailable && (
                   <p className="availability-success">
-                    Demo check passed. Real availability requires the backend.
+                    Available now. Availability is checked again when you submit.
                   </p>
                 )}
 
-                <button className="auth-submit" type="submit">
-                  Submit booking request
+                <button className="auth-submit" type="submit" disabled={submitting || checking}>
+                  {submitting ? 'Submitting...' : 'Submit booking request'}
                 </button>
               </form>
             )}
@@ -394,7 +352,7 @@ function VenueDetailsPage() {
 
         {!canBook && (
           <p className="role-notice">
-            Booking requests are available to Booker accounts.
+            Booking requests are available to requester accounts.
           </p>
         )}
 
@@ -403,8 +361,7 @@ function VenueDetailsPage() {
             <p className="eyebrow">REQUEST SAVED</p>
             <h2>Your request is pending.</h2>
             <p>
-              Your request has been added to the browser's demo booking store.
-              It has not been sent to a backend server.
+              Your request has been saved. Track its status in My Bookings.
             </p>
             <span className="status-pending">Pending</span>
             <Link className="booking-primary-link" to="/my-bookings">

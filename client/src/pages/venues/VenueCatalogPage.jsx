@@ -3,24 +3,33 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Navbar from '../../components/layout/Navbar.jsx'
 import Footer from '../../components/layout/Footer.jsx'
-import { getVenues } from '../../data/demoStore.js'
+import { fetchVenues } from '../../services/venueApi.js'
 
 function VenueCatalogPage() {
-  const [allVenues, setAllVenues] = useState(() =>
-    getVenues().filter((v) => v.active)
-  )
+  const [allVenues, setAllVenues] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [search, setSearch] = useState('')
   const [selectedType, setSelectedType] = useState('All venues')
 
   useEffect(() => {
-    function handleStoreUpdate() {
-      setAllVenues(getVenues().filter((v) => v.active))
+    const controller = new AbortController()
+
+    async function loadVenues() {
+      try {
+        setLoading(true)
+        setError('')
+        const venues = await fetchVenues(controller.signal)
+        if (!controller.signal.aborted) setAllVenues(venues)
+      } catch (err) {
+        if (!controller.signal.aborted) setError(err.message)
+      } finally {
+        if (!controller.signal.aborted) setLoading(false)
+      }
     }
 
-    window.addEventListener('coepStoreUpdate', handleStoreUpdate)
-    return () => {
-      window.removeEventListener('coepStoreUpdate', handleStoreUpdate)
-    }
+    loadVenues()
+    return () => controller.abort()
   }, [])
 
   const venueTypes = [
@@ -38,6 +47,18 @@ function VenueCatalogPage() {
 
     return matchesSearch && matchesType
   })
+
+  if (loading || error) {
+    return (
+      <main className="catalog-page">
+        <Navbar />
+        <section className="catalog-results" aria-live="polite">
+          {loading ? <p>Loading venues...</p> : <p role="alert">{error}</p>}
+        </section>
+        <Footer />
+      </main>
+    )
+  }
 
   return (
     <main className="catalog-page">
@@ -93,12 +114,12 @@ function VenueCatalogPage() {
           <div className="venue-grid">
             {filteredVenues.map((venue) => (
               <article className="venue-card" key={venue.id}>
-                <img
+                {venue.image ? <img
                   className="venue-card-image"
-                  src={venue.image || 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=900&q=80'}
+                  src={venue.image}
                   alt={venue.name}
                   loading="lazy"
-                />
+                /> : <div className="venue-card-image venue-photo-placeholder" aria-label="No venue photo available">Photo not added</div>}
 
                 <div className="venue-card-body">
                   <div className="venue-card-meta">

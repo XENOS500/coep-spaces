@@ -21,6 +21,15 @@ const venueSchema = new mongoose.Schema(
             type: [String],
             default: []
         },
+        type: { type: String, trim: true, default: "Campus venue" },
+        floor: { type: String, trim: true, default: "" },
+        room: { type: String, trim: true, default: "" },
+        image: { type: String, trim: true, default: "" },
+        approver: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            default: null
+        },
         isActive: {
             type: Boolean,
             default: true

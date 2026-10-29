@@ -1,11 +1,12 @@
-import { getUser, clearSession } from "../../services/api.js";
+import { clearSession } from "../../services/api.js";
+import { useAuth } from "../../services/authContext.js";
 import { Link, useNavigate } from "react-router-dom";
 
 function Navbar() {
   const navigate = useNavigate();
 
-  // Demo role only; real authentication will come from the backend.
-const role = getUser()?.role;
+  const { user } = useAuth();
+  const role = user?.role;
 
   function handleLogout() {
   clearSession();

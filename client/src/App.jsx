@@ -1,6 +1,8 @@
 
 import { BrowserRouter, Routes, Route, Link,useNavigate, } from "react-router-dom";
-import { getUser, clearSession } from "./services/api.js";
+import { clearSession } from "./services/api.js";
+import { useAuth } from "./services/authContext.js";
+import RequireAuth from "./components/RequireAuth.jsx";
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
 import VenueCatalogPage from "./pages/venues/VenueCatalogPage";
@@ -14,7 +16,7 @@ import VenueFormPage from "./pages/admin/VenueFormPage";
 import "./index.css";
 
 function HomePage() {
-  const user = getUser();
+  const { user } = useAuth();
 const navigate = useNavigate();
 
 const dashboardPath =
@@ -37,12 +39,17 @@ function handleLogout() {
         </Link>
 
         <nav className="home-nav-actions" aria-label="Main navigation">
-          <Link to="/login" className="home-login-link">
-            Login
-          </Link>
-          <Link to="/register" className="home-register-link">
-            Create an account
-          </Link>
+          {user ? (
+            <>
+              <Link to={dashboardPath} className="home-login-link">Dashboard</Link>
+              <button type="button" className="home-register-link" onClick={handleLogout}>Logout</button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="home-login-link">Login</Link>
+              <Link to="/register" className="home-register-link">Create an account</Link>
+            </>
+          )}
         </nav>
       </header>
 
@@ -187,15 +194,19 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        <Route path="/venues" element={<VenueCatalogPage />} />
-        <Route path="/venue/:id" element={<VenueDetailsPage />} />
-        <Route path="/my-bookings" element={<MyBookingsPage />} />
-
-        <Route path="/approvals" element={<ApprovalsPage />} />
-
-        <Route path="/admin/venues" element={<ManageVenuesPage />} />
-        <Route path="/admin/venues/new" element={<VenueFormPage />} />
-        <Route path="/admin/venues/:id/edit" element={<VenueFormPage />} />
+        <Route element={<RequireAuth />}>
+          <Route path="/venues" element={<VenueCatalogPage />} />
+          <Route path="/venue/:id" element={<VenueDetailsPage />} />
+          <Route path="/my-bookings" element={<MyBookingsPage />} />
+        </Route>
+        <Route element={<RequireAuth roles={["APPROVER"]} />}>
+          <Route path="/approvals" element={<ApprovalsPage />} />
+        </Route>
+        <Route element={<RequireAuth roles={["ADMIN"]} />}>
+          <Route path="/admin/venues" element={<ManageVenuesPage />} />
+          <Route path="/admin/venues/new" element={<VenueFormPage />} />
+          <Route path="/admin/venues/:id/edit" element={<VenueFormPage />} />
+        </Route>
 
         <Route path="*" element={<NotFound />} />
       </Routes>

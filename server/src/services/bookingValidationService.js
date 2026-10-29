@@ -6,12 +6,19 @@ const MAX_DAYS_AHEAD = 30;
 
 // Returns { error: { status, message } } on the first failed check,
 // or { start, end, venue } when everything is valid.
-export async function validateBookingInput(body) {
+export async function validateBookingInput(body = {}) {
   const { venueId, eventName, purpose, contactInfo, startTime, endTime, studCount } = body;
 
   // 1. Required fields
   if (!venueId || !eventName || !purpose || !contactInfo || !startTime || !endTime || !studCount) {
     return { error: { status: 400, message: "Please fill in all required fields" } };
+  }
+
+  if ([eventName, purpose, contactInfo].some(value => typeof value !== "string" || !value.trim())) {
+    return { error: { status: 400, message: "Event name, purpose and contact information are required" } };
+  }
+  if (purpose.trim().length > 300) {
+    return { error: { status: 400, message: "Purpose must be at most 300 characters" } };
   }
 
   // 2. venueId must look like a real MongoDB id (otherwise findById throws)

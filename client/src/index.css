@@ -1389,8 +1389,7 @@ a {
   text-align: center;
 }
 
-.bookings-empty p,
-.demo-data-note {
+.bookings-empty p {
   color: #687386;
   font-size: 13px;
   line-height: 1.8;
@@ -1400,9 +1399,6 @@ a {
   margin-top: 12px;
 }
 
-.demo-data-note {
-  margin-top: 24px;
-}
 
 @media (max-width: 640px) {
   .booking-summary > div {
@@ -1635,16 +1631,12 @@ a {
   font-weight: 500;
 }
 
-.approvals-empty p,
-.approval-demo-note {
+.approvals-empty p {
   color: #687386;
   font-size: 12px;
   line-height: 1.8;
 }
 
-.approval-demo-note {
-  margin-top: 20px;
-}
 
 .approval-message {
   margin-bottom: 18px;
@@ -2276,13 +2268,6 @@ a {
   margin-top: 20px;
 }
 
-.demo-note {
-  margin: 18px 0 0;
-  color: #85827b;
-  font-size: 0.78rem;
-  line-height: 1.6;
-  text-align: right;
-}
 
 @media (max-width: 640px) {
   .venue-form-page {
@@ -2316,9 +2301,6 @@ a {
     width: 100%;
   }
 
-  .demo-note {
-    text-align: left;
-  }
 }
 
 /* =========================================
@@ -2898,3 +2880,8 @@ a {
   font-size: 0.78rem;
   line-height: 1.5;
 }
+
+.booking-status.status-cancelled { color: #596273; background: #edf0f4; }
+button:disabled { cursor: wait; opacity: 0.65; }
+.venue-photo-placeholder { display: grid; place-items: center; background: #e9e4da; color: #687386; font-size: 14px; }
+.venue-detail-photo-placeholder { min-height: 320px; height: 100%; }

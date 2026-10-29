@@ -3,23 +3,44 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../../components/layout/Navbar.jsx";
 import Footer from "../../components/layout/Footer.jsx";
-import { getVenues, saveVenues } from "../../data/demoStore.js";
+import { fetchAdminVenues, setVenueActive, promoteApprover } from "../../services/venueApi.js";
 
 function ManageVenuesPage() {
-  const [venues, setVenues] = useState(() => getVenues());
+  const [venues, setVenues] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [approverEmail, setApproverEmail] = useState("");
+  const [promoting, setPromoting] = useState(false);
+  const [message, setMessage] = useState("");
   const [filter, setFilter] = useState("ALL");
   const [selectedVenue, setSelectedVenue] = useState(null);
 
   useEffect(() => {
-    function handleStoreUpdate() {
-      setVenues(getVenues());
+    const controller = new AbortController();
+    async function load() {
+      try {
+        const result = await fetchAdminVenues(controller.signal);
+        if (!controller.signal.aborted) { setVenues(result); setError(""); }
+      } catch (err) { if (!controller.signal.aborted) setError(err.message); }
+      finally { if (!controller.signal.aborted) setLoading(false); }
     }
-
-    window.addEventListener("coepStoreUpdate", handleStoreUpdate);
-    return () => {
-      window.removeEventListener("coepStoreUpdate", handleStoreUpdate);
-    };
+    load();
+    window.addEventListener("focus", load);
+    return () => { controller.abort(); window.removeEventListener("focus", load); };
   }, []);
+
+  async function handlePromote(event) {
+    event.preventDefault();
+    if (promoting) return;
+    setPromoting(true); setError(""); setMessage("");
+    try {
+      const result = await promoteApprover(approverEmail);
+      setMessage(result.user.name + " can now be assigned to venues as an approver.");
+      setApproverEmail("");
+    } catch (err) { setError(err.message); }
+    finally { setPromoting(false); }
+  }
 
   const filteredVenues = venues.filter((venue) => {
     if (filter === "ACTIVE") return venue.active;
@@ -27,16 +48,15 @@ function ManageVenuesPage() {
     return true;
   });
 
-  function handleDeactivate() {
-    if (!selectedVenue) return;
-
-    const updatedVenues = venues.map((venue) =>
-      venue.id === selectedVenue.id ? { ...venue, active: false } : venue
-    );
-
-    setVenues(updatedVenues);
-    saveVenues(updatedVenues);
-    setSelectedVenue(null);
+  async function handleDeactivate() {
+    if (!selectedVenue || saving) return;
+    setSaving(true); setError("");
+    try {
+      const updated = await setVenueActive(selectedVenue.id, !selectedVenue.active);
+      setVenues(current => current.map(venue => venue.id === updated.id ? updated : venue));
+      setSelectedVenue(null);
+    } catch (err) { setError(err.message); }
+    finally { setSaving(false); }
   }
 
   return (
@@ -55,6 +75,17 @@ function ManageVenuesPage() {
       </section>
 
       <section className="manage-venues-content">
+        {loading && <p role="status">Loading venues...</p>}
+        {error && <p role="alert">{error}</p>}
+        {message && <p role="status">{message}</p>}
+        <form className="venue-form-card" onSubmit={handlePromote}>
+          <h2>Add an approver</h2>
+          <p>Enter an existing user's registered email, then assign them to a venue when editing it.</p>
+          <label className="form-field">Email address
+            <input type="email" required value={approverEmail} onChange={event => setApproverEmail(event.target.value)} />
+          </label>
+          <button className="primary-button" disabled={promoting} type="submit">{promoting ? "Saving..." : "Add approver"}</button>
+        </form>
         <div className="venue-admin-summary">
           <div>
             <span>TOTAL VENUES</span>
@@ -172,13 +203,13 @@ function ManageVenuesPage() {
                         Edit details
                       </Link>
 
-                      {venue.active && (
+                      {(
                         <button
                           type="button"
                           className="venue-deactivate-button"
                           onClick={() => setSelectedVenue(venue)}
                         >
-                          Deactivate
+                          {venue.active ? "Deactivate" : "Reactivate"}
                         </button>
                       )}
                     </div>
@@ -186,7 +217,7 @@ function ManageVenuesPage() {
                 </tr>
               ))}
 
-              {filteredVenues.length === 0 && (
+              {!loading && !error && filteredVenues.length === 0 && (
                 <tr>
                   <td colSpan={6} className="venue-admin-empty">
                     No venues match this filter.
@@ -197,10 +228,6 @@ function ManageVenuesPage() {
           </table>
         </div>
 
-        <p className="venue-admin-note">
-          Demo data only. Approver assignments and venue changes are
-          not saved to the backend yet.
-        </p>
       </section>
 
       <Footer />
@@ -208,7 +235,7 @@ function ManageVenuesPage() {
       {selectedVenue && (
         <div
           className="venue-dialog-backdrop"
-          onClick={() => setSelectedVenue(null)}
+          onClick={() => { if (!saving) setSelectedVenue(null); }}
         >
           <section
             className="venue-dialog"
@@ -219,14 +246,13 @@ function ManageVenuesPage() {
           >
             <p className="eyebrow">ADMIN ACTION</p>
 
-            <h2 id="venue-dialog-title">Deactivate this venue?</h2>
+            <h2 id="venue-dialog-title">{selectedVenue.active ? "Deactivate" : "Reactivate"} this venue?</h2>
 
             <p>
-              <strong>{selectedVenue.name}</strong> will be marked inactive.
-              It will remain in the admin list, but should no longer be
-              offered for new bookings once the backend is connected.
+              <strong>{selectedVenue.name}</strong> will be {selectedVenue.active ? "hidden from new booking requests" : "available for new booking requests"}. Existing bookings are preserved.
             </p>
 
+            {error && <p role="alert">{error}</p>}
             <div className="venue-dialog-actions">
               <button
                 type="button"
@@ -240,8 +266,9 @@ function ManageVenuesPage() {
                 type="button"
                 className="venue-confirm-button"
                 onClick={handleDeactivate}
+                disabled={saving}
               >
-                Confirm deactivation
+                {saving ? "Saving..." : "Confirm"}
               </button>
             </div>
           </section>

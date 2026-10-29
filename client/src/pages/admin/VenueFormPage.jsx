@@ -1,23 +1,20 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import Navbar from "../../components/layout/Navbar.jsx";
 import Footer from "../../components/layout/Footer.jsx";
-import {
-  getVenues,
-  saveVenues,
-  DEMO_APPROVERS,
-} from "../../data/demoStore.js";
+import { fetchApprovers, fetchAdminVenue, saveVenue } from "../../services/venueApi.js";
 
 const emptyVenue = {
   name: "",
-  type: "Classroom",
+  type: "Campus venue",
   capacity: "",
   building: "",
   floor: "",
   room: "",
   image: "",
   approver: "",
+  facilities: "",
 };
 
 function VenueFormPage() {
@@ -25,17 +22,35 @@ function VenueFormPage() {
   const navigate = useNavigate();
   const isEditing = Boolean(id);
 
-  const [existingVenue] = useState(() =>
-    isEditing ? getVenues().find((venue) => venue.id === id) : null
-  );
-
-  const [formData, setFormData] = useState(() =>
-    existingVenue
-      ? { ...emptyVenue, ...existingVenue }
-      : { ...emptyVenue }
-  );
-
+  const [formData, setFormData] = useState({ ...emptyVenue });
+  const [approvers, setApprovers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    async function load() {
+      try {
+        setLoading(true); setLoadError(""); setError("");
+        const [people, venue] = await Promise.all([
+          fetchApprovers(controller.signal),
+          id ? fetchAdminVenue(id, controller.signal) : Promise.resolve(null),
+        ]);
+        if (!controller.signal.aborted) {
+          setApprovers(people);
+          setFormData(venue ? {
+            ...emptyVenue, ...venue, approver: venue.approverId,
+            facilities: venue.facilities.join(", "),
+          } : { ...emptyVenue });
+        }
+      } catch (err) { if (!controller.signal.aborted) setLoadError(err.message); }
+      finally { if (!controller.signal.aborted) setLoading(false); }
+    }
+    load();
+    return () => controller.abort();
+  }, [id]);
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -48,105 +63,33 @@ function VenueFormPage() {
     setError("");
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
-
-    const name = formData.name.trim();
-    const building = formData.building.trim();
-    const room = formData.room.trim();
+    if (saving) return;
+    setError("");
     const capacity = Number(formData.capacity);
-
-    if (
-      !name ||
-      !building ||
-      !room ||
-      !formData.capacity ||
-      !formData.approver
-    ) {
-      setError("Please complete all required fields.");
+    if (!formData.name.trim() || !formData.building.trim() || !Number.isInteger(capacity) || capacity < 1) {
+      setError("Enter a name, location and positive whole-number capacity.");
       return;
     }
-
-    if (!Number.isInteger(capacity) || capacity < 1) {
-      setError("Capacity must be a positive whole number.");
-      return;
-    }
-
-    if (!DEMO_APPROVERS.includes(formData.approver)) {
-      setError("Please select a valid approver.");
-      return;
-    }
-
-    const currentVenues = getVenues();
-
-    const updatedFields = {
-      ...formData,
-      name,
-      building,
-      room,
-      capacity,
-      floor: formData.floor.trim(),
-      image: formData.image.trim(),
-      approver: formData.approver,
-    };
-
-    let updatedVenues;
-
-    if (isEditing) {
-      const venueExists = currentVenues.some(
-        (venue) => venue.id === id
-      );
-
-      if (!venueExists) {
-        setError("This venue no longer exists. Return to venue management.");
-        return;
-      }
-
-      updatedVenues = currentVenues.map((venue) =>
-        venue.id === id
-          ? { ...venue, ...updatedFields, id: venue.id }
-          : venue
-      );
-    } else {
-      const newVenue = {
-        ...updatedFields,
-        id: `venue-${Date.now()}`,
-        active: true,
-      };
-
-      updatedVenues = [...currentVenues, newVenue];
-    }
-
+    setSaving(true);
     try {
-      saveVenues(updatedVenues);
-
-      // Notify pages currently open in this tab that shared data changed.
-      window.dispatchEvent(new Event("coep-demo-data-changed"));
-
+      await saveVenue(id, {
+        name: formData.name.trim(), location: formData.building.trim(), capacity,
+        type: formData.type, floor: formData.floor.trim(), room: formData.room.trim(),
+        image: formData.image.trim(), approver: formData.approver || null,
+        facilities: formData.facilities.split(",").map(item => item.trim()).filter(Boolean),
+      });
       navigate("/admin/venues");
-    } catch {
-      setError("Could not save the venue in this browser. Please try again.");
-    }
+    } catch (err) { setError(err.message); }
+    finally { setSaving(false); }
   }
 
-  if (isEditing && !existingVenue) {
-    return (
-      <main className="venue-form-page">
-        <Navbar />
-        <section className="venue-form-card">
-          <p className="eyebrow">COEP SPACES / ADMIN</p>
-          <h1>Venue not found</h1>
-          <p className="form-intro">
-            This demo venue could not be found. Return to venue management
-            and choose a venue to edit.
-          </p>
-          <Link className="primary-button form-back-link" to="/admin/venues">
-            Back to venues
-          </Link>
-        </section>
-        <Footer />
-      </main>
-    );
+  if (loading || loadError) {
+    return <main className="venue-form-page"><Navbar /><section className="venue-form-card">
+      {loading ? <p role="status">Loading venue details...</p> : <p role="alert">{loadError}</p>}
+      <Link to="/admin/venues">Back to venues</Link>
+    </section><Footer /></main>;
   }
 
   return (
@@ -198,6 +141,7 @@ function VenueFormPage() {
               onChange={handleChange}
               required
             >
+              <option value="Campus venue">Campus venue</option>
               <option value="Classroom">Classroom</option>
               <option value="Seminar Hall">Seminar Hall</option>
               <option value="Auditorium">Auditorium</option>
@@ -222,7 +166,7 @@ function VenueFormPage() {
           </label>
 
           <label className="form-field">
-            Building *
+            Location / building *
             <input
               name="building"
               value={formData.building}
@@ -243,13 +187,12 @@ function VenueFormPage() {
           </label>
 
           <label className="form-field">
-            Room number / name *
+            Room number / name
             <input
               name="room"
               value={formData.room}
               onChange={handleChange}
               placeholder="e.g. A-101"
-              required
             />
           </label>
 
@@ -274,22 +217,25 @@ function VenueFormPage() {
         </div>
 
         <label className="form-field">
-          Assigned approver *
+          Assigned approver
           <select
             name="approver"
             value={formData.approver}
             onChange={handleChange}
-            required
           >
-            <option value="">Select an approver</option>
-            {DEMO_APPROVERS.map((approver) => (
-              <option key={approver} value={approver}>
-                {approver}
+            <option value="">Not assigned</option>
+            {approvers.map((approver) => (
+              <option key={approver._id} value={approver._id}>
+                {approver.name} ({approver.email})
               </option>
             ))}
           </select>
         </label>
 
+        <label className="form-field">Facilities (comma-separated)
+          <input name="facilities" value={formData.facilities} onChange={handleChange} placeholder="Projector, WiFi, Microphone" />
+        </label>
+        <p>Bookings for unassigned venues remain pending until an administrator assigns an approver.</p>
         {error && (
           <p className="venue-form-error" role="alert">
             {error}
@@ -300,15 +246,11 @@ function VenueFormPage() {
           <Link className="secondary-button" to="/admin/venues">
             Cancel
           </Link>
-          <button className="primary-button" type="submit">
-            {isEditing ? "Save changes" : "Add venue"}
+          <button className="primary-button" type="submit" disabled={saving}>
+            {saving ? "Saving..." : isEditing ? "Save changes" : "Add venue"}
           </button>
         </div>
 
-        <p className="demo-note">
-          Demo mode: venue details and assignments are saved in this
-          browser, not on the backend server.
-        </p>
       </form>
 
       <Footer />
