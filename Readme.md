@@ -15,7 +15,7 @@ https://coep-spaces-self.vercel.app
 backend is hosted on render and frontend on vercel
 
 ## tech stack
-React, Express, MongoDB 
+React, Express, MongoDB atlas
 
 used jwt for authentication, bcryptjs for password hashing
 
