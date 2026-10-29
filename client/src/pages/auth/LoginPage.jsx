@@ -2,8 +2,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api, saveSession } from "../../services/api.js";
+import Brand from "../../components/Brand.jsx";
 
-function LoginPage() {
+function LoginPage({ adminOnly = false }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -25,7 +26,7 @@ function LoginPage() {
   setLoading(true);
 
   try {
-    const data = await api("/auth/login", {
+    const data = await api(adminOnly ? "/auth/admin/login" : "/auth/login", {
       method: "POST",
       body: {
         email: email.trim(),
@@ -51,11 +52,10 @@ function LoginPage() {
 }
 
   return (
-    <main className="auth-page">
+    <main className={`auth-page${adminOnly ? " auth-page--admin" : ""}`}>
       <header className="auth-header">
         <Link to="/" className="brand">
-          <span className="brand-mark">C</span>
-          <span>COEP Spaces</span>
+          <Brand />
         </Link>
 
         <Link to="/" className="auth-back-link">
@@ -65,17 +65,16 @@ function LoginPage() {
 
       <section className="auth-layout">
         <div className="auth-intro">
-          <p className="eyebrow">YOUR CAMPUS, YOUR SPACE</p>
+          <p className="eyebrow">{adminOnly ? "COEP SPACES / ADMINISTRATION" : "YOUR CAMPUS, YOUR SPACE"}</p>
 
           <h1>
-            Good ideas need
+            {adminOnly ? "A well-run campus." : "Good ideas need"}
             <br />
-            <span>the right place.</span>
+            <span>{adminOnly ? "Starts with you." : "the right place."}</span>
           </h1>
 
           <p>
-            Sign in to request campus venues, manage your bookings,
-            or review requests assigned to you.
+            {adminOnly ? "Manage campus venues, assign approvers and keep spaces ready for the COEP community." : "Sign in to request campus venues, manage your bookings, or review requests assigned to you."}
           </p>
 
           <div className="auth-side-note">
@@ -84,20 +83,20 @@ function LoginPage() {
         </div>
 
         <div className="auth-card">
-          <p className="eyebrow">WELCOME BACK</p>
-          <h2>Sign in</h2>
+          <p className="eyebrow">{adminOnly ? "ADMINISTRATOR ACCESS" : "WELCOME BACK"}</p>
+          <h2>{adminOnly ? "Admin sign in" : "Sign in"}</h2>
           <p className="auth-card-description">
-            Enter your email and password to continue.
+            {adminOnly ? "Enter your administrator email and password to continue." : "Enter your email and password to continue."}
           </p>
 
           <form onSubmit={handleSubmit}>
             <div className="form-field">
-              <label htmlFor="email">Email address</label>
+              <label htmlFor="email">{adminOnly ? "Administrator email" : "Email address"}</label>
               <input
                 id="email"
                 type="email"
                 autoComplete="email"
-                placeholder="you@example.com"
+                placeholder={adminOnly ? "Your administrator email" : "you@example.com"}
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 required
@@ -105,7 +104,7 @@ function LoginPage() {
             </div>
 
             <div className="form-field">
-              <label htmlFor="password">Password</label>
+              <label htmlFor="password">{adminOnly ? "Administrator password" : "Password"}</label>
               <input
                 id="password"
                 type="password"
@@ -126,16 +125,14 @@ function LoginPage() {
             )}
 
             <button className="auth-submit" type="submit" disabled={loading}>
-               {loading ? "Signing in..." : "Sign in"}
+               {loading ? "Signing in..." : adminOnly ? "Sign in as administrator" : "Sign in"}
             </button>
           </form>
 
           <p className="auth-switch">
-            New to COEP Spaces?{" "}
-            <Link to="/register">Create an account</Link>
+            {adminOnly ? <>Booking a space? <Link to="/login">Use regular sign in</Link></> : <>New to COEP Spaces? <Link to="/register">Create an account</Link></>}
           </p>
-
-          
+          {!adminOnly && <p className="auth-switch auth-admin-link"><Link to="/admin/login">Administrator sign in ↗</Link></p>}
         </div>
       </section>
     </main>

@@ -5,6 +5,8 @@ import { useAuth } from "./services/authContext.js";
 import RequireAuth from "./components/RequireAuth.jsx";
 import Navbar from "./components/layout/Navbar.jsx";
 import Sidebar from "./components/layout/Sidebar.jsx";
+import Brand from "./components/Brand.jsx";
+import campusPhoto from "./assets/coep-campus.png";
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
 import VenueCatalogPage from "./pages/venues/VenueCatalogPage";
@@ -36,8 +38,7 @@ function handleLogout() {
     <div className="home-page">
       <header className="home-navbar">
         <Link to="/" className="home-brand" aria-label="COEP Spaces home">
-          <span className="home-brand-mark">C</span>
-          <span>COEP Spaces</span>
+          <Brand />
         </Link>
 
         <nav className="home-nav-actions" aria-label="Main navigation">
@@ -56,59 +57,22 @@ function handleLogout() {
       </header>
 
       <main className="home-main">
-        <section className="home-hero">
+        <section className="home-hero home-hero--campus" aria-labelledby="home-hero-title">
+          <img className="home-hero-image" src={campusPhoto} alt="Historic stone building on the COEP campus, framed by trees" fetchPriority="high" />
+          <div className="home-hero-shade" aria-hidden="true" />
           <div className="home-hero-copy">
             <p className="home-eyebrow">COEP TECHNOLOGICAL UNIVERSITY</p>
-
-            <h1>
-              Make room
-              <br />
-              <span>for great ideas.</span>
-            </h1>
-
-            <p className="home-description">
-              A simpler way for the COEP community to discover campus
-              venues and organise classes, meetings, events and more.
-            </p>
-
+            <h1 id="home-hero-title">Request. Review.<br /><span>Reserve.</span></h1>
+            <p className="home-description">Find the right place for your next class, conversation or big idea. Discover and book spaces across our campus, all in one place.</p>
             <div className="home-hero-actions">
-            <Link
-              to={user ? dashboardPath : "/login"}
-              className="home-primary-button"
-            >
-              {user ? "Go to dashboard" : "Get started"}
-              {" "}<span aria-hidden="true">↗</span>
-            </Link>
-
-            {!user && (
-              <Link to="/register" className="home-secondary-button">
-                Create an account
+              <Link to={user ? dashboardPath : "/login"} className="home-primary-button">
+                {user ? "Go to dashboard" : "Find your space"} <span aria-hidden="true">↗</span>
               </Link>
-            )}
-          </div>
-
-            <p className="home-supporting-note">
-              Discover a space. Make a request. Bring people together.
-            </p>
-          </div>
-
-          <div className="home-hero-visual">
-            <img
-              className="home-hero-image"
-              src="https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1400&q=85"
-              alt="University campus building surrounded by greenery"
-            />
-
-            <div className="home-image-label">
-              <span className="home-image-label-dot" />
-              <div>
-                <strong>One campus. Many possibilities.</strong>
-                <span>Spaces for learning, collaboration and events.</span>
-              </div>
+              {!user && <Link to="/register" className="home-secondary-button">Create an account</Link>}
             </div>
-
-            <span className="home-image-index">COEP / SPACES</span>
+            <p className="home-supporting-note">Classrooms. Seminar halls. Room for possibility.</p>
           </div>
+          <div className="home-campus-caption"><span className="home-campus-caption-line" />SHIVAJINAGAR, PUNE</div>
         </section>
 
         <section className="home-how-section">
@@ -123,7 +87,7 @@ function handleLogout() {
 
           <div className="home-steps">
             <article className="home-step">
-              <span className="home-step-number">01 / DISCOVER</span>
+              <span className="home-step-label">DISCOVER</span>
               <h3>Find your space</h3>
               <p>
                 Explore venues and check details such as capacity,
@@ -132,7 +96,7 @@ function handleLogout() {
             </article>
 
             <article className="home-step">
-              <span className="home-step-number">02 / REQUEST</span>
+              <span className="home-step-label">REQUEST</span>
               <h3>Plan your event</h3>
               <p>
                 Select a date and time, add your purpose, and submit
@@ -141,7 +105,7 @@ function handleLogout() {
             </article>
 
             <article className="home-step">
-              <span className="home-step-number">03 / CONFIRM</span>
+              <span className="home-step-label">CONFIRM</span>
               <h3>Track your booking</h3>
               <p>
                 Follow the status of your request while the assigned
@@ -156,19 +120,24 @@ function handleLogout() {
             <p className="home-eyebrow">YOUR NEXT PLAN STARTS HERE</p>
             <h2>Let's make space for it.</h2>
           </div>
-          <Link to={user ? "/venues" : "/login"} className="home-primary-button">
-            Explore COEP Spaces <span aria-hidden="true">↗</span>
-          </Link>
+          <div className="home-cta-actions">
+            <Link to={user ? dashboardPath : "/login"} className="home-primary-button">Explore COEP Spaces <span aria-hidden="true">↗</span></Link>
+            <Link to="/admin/login" className="home-secondary-button home-admin-button">Admin login <span aria-hidden="true">↗</span></Link>
+          </div>
         </section>
       </main>
 
       <footer className="home-footer">
         <Link to="/" className="home-brand">
-          <span className="home-brand-mark">C</span>
-          <span>COEP Spaces</span>
+          <Brand />
         </Link>
         <p>Campus spaces, made easier to organise.</p>
-        <span>COEP Technological University</span>
+        <span>
+          COEP Technological University
+          <br />
+          <a href="/privacy.html">Privacy Policy</a>{" · "}
+          <a href="/terms.html">Terms and Conditions</a>
+        </span>
       </footer>
     </div>
   );
@@ -205,7 +174,8 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
 
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/login" element={<LoginPage key="member" />} />
+        <Route path="/admin/login" element={<LoginPage key="admin" adminOnly />} />
         <Route path="/register" element={<RegisterPage />} />
 
         <Route element={<RequireAuth />}>

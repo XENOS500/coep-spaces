@@ -1,5 +1,6 @@
 
 import { Link } from "react-router-dom";
+import Brand from "../Brand.jsx";
 import { useAuth } from "../../services/authContext.js";
 
 function Navbar() {
@@ -19,8 +20,7 @@ function Navbar() {
         to="/"
         aria-label="COEP Spaces home"
       >
-        <span className="brand-mark">C</span>
-        <span className="brand-name">COEP Spaces</span>
+        <Brand />
       </Link>
 
       <div className="navbar-right">

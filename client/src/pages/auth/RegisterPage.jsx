@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from "react-router-dom";
 import { api, saveSession } from "../../services/api.js";
+import Brand from "../../components/Brand.jsx";
 
 function RegisterPage() {
   const [name, setName] = useState('')
@@ -53,8 +54,7 @@ function RegisterPage() {
     <main className="auth-page">
       <header className="auth-header">
         <Link to="/" className="brand">
-          <span className="brand-mark">C</span>
-          <span>COEP Spaces</span>
+          <Brand />
         </Link>
 
         <Link to="/login" className="auth-back-link">

@@ -1,12 +1,11 @@
+import Brand from "../Brand.jsx";
 
 function Footer() {
   return (
     <footer className="footer">
       <div className="footer-brand">
-        <span className="brand-mark">C</span>
-
-        <div>
-          <strong>COEP Spaces</strong>
+                <div>
+          <Brand />
           <p>Campus spaces, made simpler.</p>
         </div>
       </div>
@@ -18,6 +17,9 @@ function Footer() {
 
       <p className="footer-copy">
         © {new Date().getFullYear()} COEP Spaces
+        <br />
+        <a href="/privacy.html">Privacy Policy</a>{" · "}
+        <a href="/terms.html">Terms and Conditions</a>
       </p>
     </footer>
   )

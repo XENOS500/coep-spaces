@@ -3240,3 +3240,155 @@ button:disabled { cursor: wait; opacity: 0.65; }
     display: none;
   }
 }
+
+/* COEP identity and campus welcome */
+.brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 700;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+.coep-emblem { display: block; width: 48px; height: 48px; flex: 0 0 auto; object-fit: contain; }
+.home-navbar { min-height: 88px; }
+.home-navbar .coep-emblem { width: 54px; height: 54px; }
+.home-footer .coep-emblem, .footer .coep-emblem { width: 42px; height: 42px; }
+.home-page { --home-green: #234d3e; --home-green-dark: #17382e; --home-rust: #955638; }
+.home-hero--campus {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: none;
+  min-height: clamp(640px, calc(100svh - 88px), 850px);
+  margin: 0;
+  padding: 96px 7% 110px;
+  overflow: hidden;
+  background: #142f28;
+}
+.home-hero--campus .home-hero-image {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  object-fit: cover;
+  object-position: center 28%;
+}
+.home-hero-shade {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(90deg, rgba(10, 31, 25, 0.93) 0%, rgba(12, 34, 28, 0.76) 39%, rgba(12, 30, 24, 0.12) 100%), linear-gradient(0deg, rgba(9, 26, 22, 0.55), transparent 65%);
+}
+.home-hero--campus .home-hero-copy { width: 100%; max-width: 730px; padding: 0; }
+.home-hero--campus .home-eyebrow { color: #ecd49c; letter-spacing: 0.2em; margin-bottom: 24px; }
+.home-hero--campus h1 { color: #fffdf6; font-size: clamp(3rem, 5.4vw, 6rem); letter-spacing: -0.045em; line-height: 1.08; text-wrap: balance; }
+.home-hero--campus h1 span { color: #ead3a3; }
+.home-hero--campus .home-description { max-width: 460px; color: #e2e7de; font-size: 1.02rem; line-height: 1.85; margin-top: 28px; }
+.home-hero--campus .home-hero-actions { gap: 14px; margin-top: 34px; }
+.home-hero--campus .home-primary-button { min-height: 52px; padding: 0 23px; background: #e7cb92; color: #17382e; border-color: #e7cb92; }
+.home-hero--campus .home-primary-button:hover { background: #f3dfb5; border-color: #f3dfb5; }
+.home-hero--campus .home-secondary-button { min-height: 52px; color: #fffdf6; border-color: rgba(255, 253, 246, 0.55); background: rgba(12, 34, 28, 0.16); }
+.home-hero--campus .home-secondary-button:hover { background: rgba(255, 253, 246, 0.12); border-color: #fffdf6; }
+.home-hero--campus .home-supporting-note { color: #d3ddcf; font-size: 0.76rem; margin-top: 28px; }
+.home-campus-caption { position: absolute; right: 7%; bottom: 38px; display: flex; align-items: center; gap: 13px; color: #fffdf6; font-size: 0.65rem; font-weight: 600; letter-spacing: 0.18em; }
+.home-campus-caption-line { width: 38px; height: 1px; background: #e7cb92; }
+.home-bottom-cta { padding-top: 54px; padding-bottom: 54px; background: #e7e8dc; }
+.home-cta-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.home-admin-button { border-color: #839080; background: transparent; }
+.home-admin-button:hover { background: #f6f5eb; }
+.home-page a:focus-visible, .home-page button:focus-visible { outline: 3px solid #b18642; outline-offset: 5px; }
+.home-hero--campus a:focus-visible { outline-color: #f5dfad; }
+.auth-page { color: #203e34; background: #f5f1e8; }
+.auth-intro h1 span { color: #315f4c; }
+.auth-page .auth-submit { background: #234d3e; }
+.auth-page .auth-submit:hover { background: #17382e; }
+.auth-page .form-field input:focus { outline-color: #47745c; }
+.auth-page--admin .auth-card { border-top: 3px solid #b28d48; }
+.auth-page--admin .auth-intro h1 span { color: #8e6834; }
+.auth-page--admin .auth-side-note { color: #8e6834; }
+.auth-admin-link { margin-top: 12px; }
+@media (max-width: 1000px) {
+  .home-hero--campus { padding-top: 80px; padding-bottom: 100px; }
+  .home-hero--campus .home-hero-copy { max-width: 650px; }
+  .home-hero-shade { background: linear-gradient(90deg, rgba(10,31,25,.9), rgba(10,31,25,.6) 65%, rgba(10,31,25,.3)); }
+  .home-cta-actions { flex-shrink: 0; flex-direction: column; align-items: stretch; }
+}
+@media (max-width: 700px) {
+  .brand-lockup { gap: 9px; }
+  .coep-emblem { width: 40px; height: 40px; }
+  .home-navbar { min-height: 78px; padding: 12px 5%; gap: 12px; flex-wrap: wrap; }
+  .home-navbar .coep-emblem { width: 40px; height: 40px; }
+  .home-nav-actions { gap: 14px; margin-left: auto; }
+  .home-hero--campus { min-height: 670px; padding: 74px 6% 96px; }
+  .home-hero--campus .home-eyebrow { font-size: 0.63rem; letter-spacing: 0.16em; }
+  .home-hero--campus h1 { font-size: clamp(2.8rem, 9.8vw, 4rem); line-height: 1.12; }
+  .home-hero--campus .home-description { max-width: 390px; font-size: 0.93rem; margin-top: 24px; }
+  .home-hero--campus .home-primary-button, .home-hero--campus .home-secondary-button { min-height: 49px; padding: 0 17px; font-size: 0.82rem; }
+  .home-hero--campus .home-hero-actions { gap: 10px; }
+  .home-campus-caption { bottom: 28px; right: 6%; font-size: 0.58rem; }
+  .home-hero-shade { background: linear-gradient(90deg, rgba(9,29,23,.9), rgba(9,29,23,.58)), linear-gradient(0deg, rgba(9,29,23,.6), transparent); }
+  .home-cta-actions { flex-direction: row; width: 100%; }
+  .home-cta-actions a { flex: 1 1 160px; }
+  .auth-header .brand { font-size: 17px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-primary-button, .home-secondary-button { transition: none; }
+  .home-primary-button:hover { transform: none; }
+}
+
+/* Welcome actions and three-step guide */
+.home-nav-actions .home-login-link,
+.home-nav-actions .home-register-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--home-ink);
+  font-size: 1.05rem;
+  font-weight: 700;
+  transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+.home-nav-actions .home-register-link { border-color: #c9c1b3; }
+.home-hero--campus .home-primary-button,
+.home-hero--campus .home-secondary-button { font-size: 1rem; }
+.home-nav-actions .home-login-link:hover,
+.home-nav-actions .home-register-link:hover,
+.home-hero--campus .home-primary-button:hover,
+.home-hero--campus .home-secondary-button:hover {
+  background: #17382e;
+  border-color: #17382e;
+  color: #ffffff;
+}
+.home-how-section { padding-inline: 4%; }
+.home-steps { gap: 22px; border: 0; }
+.home-step,
+.home-step + .home-step {
+  padding: 30px 24px;
+  border: 1px solid #b79b70;
+  border-radius: 6px;
+  background: #F5E2BD;
+}
+.home-step-label { color: #171717; font-size: 0.83rem; font-weight: 700; letter-spacing: 0.12em; }
+.home-step h3 { margin: 20px 0 14px; color: #111111; font-size: clamp(1.6rem, 2.1vw, 1.9rem); font-weight: 700; line-height: 1.25; }
+.home-step p { width: 100%; max-width: none; color: #1a1a1a; font-size: 1.05rem; font-weight: 600; line-height: 1.8; }
+@media (max-width: 900px) {
+  .home-steps { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+}
+@media (max-width: 700px) {
+  .home-nav-actions { gap: 8px; }
+  .home-nav-actions .home-login-link,
+  .home-nav-actions .home-register-link { min-height: 44px; padding: 0 12px; font-size: 1rem; }
+  .home-hero--campus .home-primary-button,
+  .home-hero--campus .home-secondary-button { font-size: 0.95rem; }
+  .home-how-section { padding-inline: 6%; }
+  .home-step, .home-step + .home-step { padding: 26px 22px; }
+}

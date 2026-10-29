@@ -57,6 +57,13 @@ test("backend integration with an isolated MongoDB database", {
       assert.equal((await request("/health")).status, 200);
       assert.equal((await request("/auth/login", { method: "POST", body: { email: "requester@example.com", password: "IntegrationPassword123!" } })).status, 200);
       assert.equal((await request("/auth/login", { method: "POST", body: { email: "requester@example.com", password: "wrong" } })).status, 401);
+      const deniedAdmin = await request("/auth/admin/login", { method: "POST", body: { email: "requester@example.com", password: "IntegrationPassword123!" } });
+      assert.equal(deniedAdmin.status, 403);
+      assert.equal(deniedAdmin.body.token, undefined);
+      assert.equal((await request("/auth/admin/login", { method: "POST", body: { email: "admin@example.com", password: "wrong" } })).status, 401);
+      const adminLogin = await request("/auth/admin/login", { method: "POST", body: { email: "admin@example.com", password: "IntegrationPassword123!" } });
+      assert.equal(adminLogin.status, 200);
+      assert.equal(adminLogin.body.user.role, "ADMIN");
       assert.equal((await request("/auth/me")).status, 401);
       assert.equal((await request("/auth/me", { token: "invalid" })).status, 401);
       assert.equal((await request("/auth/me", { token: requester.token })).body.user.id, requester.user.id);

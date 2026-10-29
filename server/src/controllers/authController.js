@@ -59,7 +59,7 @@ export const registerUser = async (req, res) => {
 
 
 
-export const loginUser = async (req, res) => {
+const signIn = async (req, res, adminOnly = false) => {
   const { email, password } = req.body ?? {};
 
   if (
@@ -85,6 +85,13 @@ export const loginUser = async (req, res) => {
     });
   }
 
+  if (adminOnly && user.role !== "ADMIN") {
+    return res.status(403).json({
+      success: false,
+      message: "This account does not have administrator access. Please use the regular sign-in page.",
+    });
+  }
+
   return res.status(200).json({
     success: true,
     message: "Login successful",
@@ -100,6 +107,9 @@ export const loginUser = async (req, res) => {
 
 
 
+
+export const loginUser = (req, res) => signIn(req, res);
+export const loginAdmin = (req, res) => signIn(req, res, true);
 
 export const getMe = async (req, res) => {
   return res.status(200).json({
