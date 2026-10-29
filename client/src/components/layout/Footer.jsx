@@ -18,6 +18,7 @@ function Footer() {
       <p className="footer-copy">
         © {new Date().getFullYear()} COEP Spaces
         <br />
+        <a href="/about.html">About</a>{" · "}
         <a href="/privacy.html">Privacy Policy</a>{" · "}
         <a href="/terms.html">Terms and Conditions</a>
       </p>
