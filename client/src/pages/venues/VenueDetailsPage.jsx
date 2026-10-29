@@ -7,6 +7,7 @@ import { fetchVenue } from '../../services/venueApi.js'
 import { createBooking, checkAvailability as fetchAvailability } from '../../services/bookingApi.js'
 import { useAuth } from '../../services/authContext.js'
 import { campusTimestamp, campusToday } from '../../services/dates.js'
+import VenuePhoto from '../../components/VenuePhoto.jsx'
 
 function VenueDetailsPage() {
   const { id } = useParams()
@@ -141,10 +142,7 @@ function VenueDetailsPage() {
 
         <section className="venue-detail-hero">
           <div className="venue-detail-image-wrap">
-            {venue.image ? <img
-              src={venue.image}
-              alt={venue.name}
-            /> : <div className="venue-photo-placeholder venue-detail-photo-placeholder" aria-label="No venue photo available">Photo not added</div>}
+            <VenuePhoto venue={venue} placeholderClassName="venue-detail-photo-placeholder" />
             <span className="venue-type-label">{venue.type}</span>
           </div>
 

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Footer from '../../components/layout/Footer.jsx'
 import { fetchVenues } from '../../services/venueApi.js'
+import VenuePhoto from '../../components/VenuePhoto.jsx'
 
 function VenueCatalogPage() {
   const [allVenues, setAllVenues] = useState([])
@@ -113,12 +114,11 @@ function VenueCatalogPage() {
           <div className="venue-grid">
             {filteredVenues.map((venue) => (
               <article className="venue-card" key={venue.id}>
-                {venue.image ? <img
+                <VenuePhoto
+                  venue={venue}
                   className="venue-card-image"
-                  src={venue.image}
-                  alt={venue.name}
                   loading="lazy"
-                /> : <div className="venue-card-image venue-photo-placeholder" aria-label="No venue photo available">Photo not added</div>}
+                />
 
                 <div className="venue-card-body">
                   <div className="venue-card-meta">
