@@ -1,7 +1,7 @@
 
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import Navbar from '../../components/layout/Navbar.jsx'
+
 import Footer from '../../components/layout/Footer.jsx'
 import {
   getVenues,
@@ -159,7 +159,7 @@ function VenueDetailsPage() {
   if (!venue) {
     return (
       <main className="venue-detail-page">
-        <Navbar />
+        
         <section className="venue-not-found">
           <p className="eyebrow">VENUE DIRECTORY</p>
           <h1>We couldn't find that space.</h1>
