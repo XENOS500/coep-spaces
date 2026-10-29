@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import Navbar from "../../components/layout/Navbar.jsx";
+
 import Footer from "../../components/layout/Footer.jsx";
 import {
   getVenues,
@@ -151,7 +151,7 @@ function VenueFormPage() {
 
   return (
     <main className="venue-form-page">
-      <Navbar />
+   
 
       <div className="venue-form-heading">
         <div>

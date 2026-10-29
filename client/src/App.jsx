@@ -1,6 +1,10 @@
 
-import { BrowserRouter, Routes, Route, Link,useNavigate, } from "react-router-dom";
-import { getUser, clearSession } from "./services/api.js";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { getUser } from "./services/api.js";
+
+import Navbar from "./components/layout/Navbar";
+import Sidebar from "./components/layout/Sidebar";
+
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
 import VenueCatalogPage from "./pages/venues/VenueCatalogPage";
@@ -10,24 +14,18 @@ import ApprovalsPage from "./pages/approver/ApprovalsPage";
 import ManageVenuesPage from "./pages/admin/ManageVenuesPage";
 import VenueFormPage from "./pages/admin/VenueFormPage";
 
-
 import "./index.css";
 
 function HomePage() {
   const user = getUser();
-const navigate = useNavigate();
 
-const dashboardPath =
-  user?.role === "ADMIN"
-    ? "/admin/venues"
-    : user?.role === "APPROVER"
-      ? "/approvals"
-      : "/venues";
+  const dashboardPath =
+    user?.role === "ADMIN"
+      ? "/admin/venues"
+      : user?.role === "APPROVER"
+        ? "/approvals"
+        : "/venues";
 
-function handleLogout() {
-  clearSession();
-  navigate("/login", { replace: true });
-}
   return (
     <div className="home-page">
       <header className="home-navbar">
@@ -40,6 +38,7 @@ function handleLogout() {
           <Link to="/login" className="home-login-link">
             Login
           </Link>
+
           <Link to="/register" className="home-register-link">
             Create an account
           </Link>
@@ -63,20 +62,20 @@ function handleLogout() {
             </p>
 
             <div className="home-hero-actions">
-            <Link
-              to={user ? dashboardPath : "/login"}
-              className="home-primary-button"
-            >
-              {user ? "Go to dashboard" : "Get started"}
-              {" "}<span aria-hidden="true">↗</span>
-            </Link>
-
-            {!user && (
-              <Link to="/register" className="home-secondary-button">
-                Create an account
+              <Link
+                to={user ? dashboardPath : "/login"}
+                className="home-primary-button"
+              >
+                {user ? "Go to dashboard" : "Get started"}{" "}
+                <span aria-hidden="true">↗</span>
               </Link>
-            )}
-          </div>
+
+              {!user && (
+                <Link to="/register" className="home-secondary-button">
+                  Create an account
+                </Link>
+              )}
+            </div>
 
             <p className="home-supporting-note">
               Discover a space. Make a request. Bring people together.
@@ -94,7 +93,9 @@ function handleLogout() {
               <span className="home-image-label-dot" />
               <div>
                 <strong>One campus. Many possibilities.</strong>
-                <span>Spaces for learning, collaboration and events.</span>
+                <span>
+                  Spaces for learning, collaboration and events.
+                </span>
               </div>
             </div>
 
@@ -147,7 +148,11 @@ function handleLogout() {
             <p className="home-eyebrow">YOUR NEXT PLAN STARTS HERE</p>
             <h2>Let's make space for it.</h2>
           </div>
-          <Link to={user ? "/venues" : "/login"} className="home-primary-button">
+
+          <Link
+            to={user ? dashboardPath : "/login"}
+            className="home-primary-button"
+          >
             Explore COEP Spaces <span aria-hidden="true">↗</span>
           </Link>
         </section>
@@ -158,9 +163,26 @@ function handleLogout() {
           <span className="home-brand-mark">C</span>
           <span>COEP Spaces</span>
         </Link>
+
         <p>Campus spaces, made easier to organise.</p>
         <span>COEP Technological University</span>
       </footer>
+    </div>
+  );
+}
+
+function WorkspaceLayout({ children }) {
+  return (
+    <div className="app-workspace">
+      <Navbar />
+
+      <div className="workspace-body">
+        <Sidebar />
+
+        <main className="workspace-content">
+          {children}
+        </main>
+      </div>
     </div>
   );
 }
@@ -171,6 +193,7 @@ function NotFound() {
       <p className="home-eyebrow">404 / PAGE NOT FOUND</p>
       <h1>This space doesn't exist.</h1>
       <p>The address may be incorrect, or the page may have moved.</p>
+
       <Link to="/" className="home-primary-button">
         Return home
       </Link>
@@ -182,20 +205,74 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Public pages */}
         <Route path="/" element={<HomePage />} />
-
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        <Route path="/venues" element={<VenueCatalogPage />} />
-        <Route path="/venue/:id" element={<VenueDetailsPage />} />
-        <Route path="/my-bookings" element={<MyBookingsPage />} />
+        {/* Shared workspace layout: one topbar + one sidebar */}
+        <Route
+          path="/venues"
+          element={
+            <WorkspaceLayout>
+              <VenueCatalogPage />
+            </WorkspaceLayout>
+          }
+        />
 
-        <Route path="/approvals" element={<ApprovalsPage />} />
+        <Route
+          path="/venue/:id"
+          element={
+            <WorkspaceLayout>
+              <VenueDetailsPage />
+            </WorkspaceLayout>
+          }
+        />
 
-        <Route path="/admin/venues" element={<ManageVenuesPage />} />
-        <Route path="/admin/venues/new" element={<VenueFormPage />} />
-        <Route path="/admin/venues/:id/edit" element={<VenueFormPage />} />
+        <Route
+          path="/my-bookings"
+          element={
+            <WorkspaceLayout>
+              <MyBookingsPage />
+            </WorkspaceLayout>
+          }
+        />
+
+        <Route
+          path="/approvals"
+          element={
+            <WorkspaceLayout>
+              <ApprovalsPage />
+            </WorkspaceLayout>
+          }
+        />
+
+        <Route
+          path="/admin/venues"
+          element={
+            <WorkspaceLayout>
+              <ManageVenuesPage />
+            </WorkspaceLayout>
+          }
+        />
+
+        <Route
+          path="/admin/venues/new"
+          element={
+            <WorkspaceLayout>
+              <VenueFormPage />
+            </WorkspaceLayout>
+          }
+        />
+
+        <Route
+          path="/admin/venues/:id/edit"
+          element={
+            <WorkspaceLayout>
+              <VenueFormPage />
+            </WorkspaceLayout>
+          }
+        />
 
         <Route path="*" element={<NotFound />} />
       </Routes>

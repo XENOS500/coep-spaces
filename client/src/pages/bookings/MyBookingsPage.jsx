@@ -1,78 +1,83 @@
 
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
-import Navbar from '../../components/layout/Navbar.jsx'
-import Footer from '../../components/layout/Footer.jsx'
-import { getBookings } from '../../data/demoStore.js'
-
-const filters = ['ALL', 'PENDING', 'APPROVED', 'REJECTED']
-
-function formatDate(date) {
-  return new Date(`${date}T00:00:00`).toLocaleDateString('en-IN', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })
-}
-
-function formatTime(time) {
-  const [hours, minutes] = time.split(':')
-  const date = new Date()
-  date.setHours(Number(hours), Number(minutes), 0, 0)
-
-  return date.toLocaleTimeString('en-IN', {
-    hour: 'numeric',
-    minute: '2-digit',
-  })
-}
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import Footer from "../../components/layout/Footer.jsx";
+import {
+  getBookings,
+  dispatchStoreEvent,
+} from "../../data/demoStore.js";
 
 function MyBookingsPage() {
-  const [bookings, setBookings] = useState(() => getBookings())
-  const [selectedFilter, setSelectedFilter] = useState('ALL')
+  const [bookings, setBookings] = useState(() => getBookings());
+  const [activeFilter, setActiveFilter] = useState("ALL");
 
   useEffect(() => {
     function refreshBookings() {
-      setBookings(getBookings())
+      setBookings(getBookings());
     }
 
-    window.addEventListener('focus', refreshBookings)
-    window.addEventListener('pageshow', refreshBookings)
-    window.addEventListener('coep-demo-data-changed', refreshBookings)
-    window.addEventListener('storage', refreshBookings)
+    window.addEventListener("storage", refreshBookings);
+    window.addEventListener("demoStoreUpdate", refreshBookings);
 
     return () => {
-      window.removeEventListener('focus', refreshBookings)
-      window.removeEventListener('pageshow', refreshBookings)
-      window.removeEventListener('coep-demo-data-changed', refreshBookings)
-      window.removeEventListener('storage', refreshBookings)
-    }
-  }, [])
+      window.removeEventListener("storage", refreshBookings);
+      window.removeEventListener("demoStoreUpdate", refreshBookings);
+    };
+  }, []);
 
-  // Filter by the demo Booker identity when one is set.
-  const currentEmail = sessionStorage.getItem('demoBookerEmail')
-  const myBookings = currentEmail
-    ? bookings.filter((booking) => booking.email === currentEmail)
-    : bookings
+  const visibleBookings = useMemo(() => {
+    if (activeFilter === "ALL") return bookings;
 
-  const filteredBookings = myBookings.filter((booking) => {
-    return selectedFilter === 'ALL' || booking.status === selectedFilter
-  })
+    return bookings.filter(
+      (booking) => booking.status?.toUpperCase() === activeFilter
+    );
+  }, [bookings, activeFilter]);
 
-  const pendingCount = myBookings.filter(
-    (booking) => booking.status === 'PENDING'
-  ).length
+  const pendingCount = bookings.filter(
+    (booking) => booking.status?.toUpperCase() === "PENDING"
+  ).length;
 
-  const approvedCount = myBookings.filter(
-    (booking) => booking.status === 'APPROVED'
-  ).length
+  const approvedCount = bookings.filter(
+    (booking) => booking.status?.toUpperCase() === "APPROVED"
+  ).length;
+
+  const filters = [
+    { label: "All requests", value: "ALL" },
+    { label: "Pending", value: "PENDING" },
+    { label: "Approved", value: "APPROVED" },
+    { label: "Rejected", value: "REJECTED" },
+  ];
+
+  function formatDate(date) {
+    if (!date) return "Not specified";
+
+    const parsedDate = new Date(`${date}T00:00:00`);
+
+    if (Number.isNaN(parsedDate.getTime())) return date;
+
+    return parsedDate.toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  }
+
+  function formatStatus(status) {
+    if (!status) return "Pending";
+
+    return status.charAt(0).toUpperCase() +
+      status.slice(1).toLowerCase();
+  }
 
   return (
     <main className="my-bookings-page">
-      <Navbar />
-
       <section className="bookings-heading">
         <p className="eyebrow">COEP / YOUR ACTIVITY</p>
-        <h1>My <span>bookings.</span></h1>
+
+        <h1>
+          My <span>bookings.</span>
+        </h1>
+
         <p>
           Keep track of your venue requests, upcoming events and
           approval decisions in one place.
@@ -83,12 +88,14 @@ function MyBookingsPage() {
         <div className="booking-summary">
           <div>
             <span>TOTAL REQUESTS</span>
-            <strong>{myBookings.length}</strong>
+            <strong>{bookings.length}</strong>
           </div>
+
           <div>
             <span>AWAITING DECISION</span>
             <strong>{pendingCount}</strong>
           </div>
+
           <div>
             <span>APPROVED</span>
             <strong>{approvedCount}</strong>
@@ -97,7 +104,8 @@ function MyBookingsPage() {
 
         <div className="bookings-list-heading">
           <h2>Booking requests</h2>
-          <Link to="/venues" className="booking-primary-link">
+
+          <Link className="booking-primary-link" to="/venues">
             Explore venues
           </Link>
         </div>
@@ -105,72 +113,83 @@ function MyBookingsPage() {
         <div className="booking-filters" aria-label="Filter bookings">
           {filters.map((filter) => (
             <button
-              key={filter}
+              key={filter.value}
               type="button"
-              className={
-                selectedFilter === filter
-                  ? 'booking-filter active'
-                  : 'booking-filter'
-              }
-              onClick={() => setSelectedFilter(filter)}
-              aria-pressed={selectedFilter === filter}
+              className={`booking-filter ${
+                activeFilter === filter.value ? "active" : ""
+              }`}
+              aria-pressed={activeFilter === filter.value}
+              onClick={() => setActiveFilter(filter.value)}
             >
-              {filter === 'ALL'
-                ? 'All requests'
-                : filter.charAt(0) + filter.slice(1).toLowerCase()}
+              {filter.label}
             </button>
           ))}
         </div>
 
         <div className="my-bookings-list">
-          {filteredBookings.length > 0 ? (
-            filteredBookings.map((booking) => (
-              <article className="my-booking-card" key={booking.id}>
-                <div className="my-booking-main">
-                  <div className="my-booking-title-row">
-                    <div>
-                      <p className="booking-reference">{booking.id}</p>
-                      <h3>{booking.venue}</h3>
+          {visibleBookings.length > 0 ? (
+            visibleBookings.map((booking) => {
+              const status = booking.status?.toUpperCase() || "PENDING";
+              const venueName =
+                booking.venue || booking.venueName || "Venue request";
+
+              return (
+                <article
+                  className="my-booking-card"
+                  key={booking.id}
+                >
+                  <div className="my-booking-main">
+                    <div className="my-booking-title-row">
+                      <div>
+                        <p className="booking-reference">
+                          REQUEST · {booking.id || "N/A"}
+                        </p>
+
+                        <h3>{venueName}</h3>
+                      </div>
+
+                      <span
+                        className={`booking-status status-${status.toLowerCase()}`}
+                      >
+                        {formatStatus(status)}
+                      </span>
                     </div>
 
-                    <span
-                      className={`booking-status status-${booking.status.toLowerCase()}`}
-                    >
-                      {booking.status.charAt(0) +
-                        booking.status.slice(1).toLowerCase()}
-                    </span>
-                  </div>
+                    <p className="my-booking-purpose">
+                      {booking.purpose || "No purpose provided"}
+                    </p>
 
-                  <p className="my-booking-purpose">{booking.purpose}</p>
+                    <div className="my-booking-details">
+                      <span>
+                        <strong>DATE</strong>
+                        {formatDate(booking.date)}
+                      </span>
 
-                  <div className="my-booking-details">
-                    <span>
-                      <strong>Date</strong>
-                      {formatDate(booking.date)}
-                    </span>
-                    <span>
-                      <strong>Time</strong>
-                      {formatTime(booking.startTime)} – {formatTime(booking.endTime)}
-                    </span>
-                    <span>
-                      <strong>Attendees</strong>
-                      {booking.attendees}
-                    </span>
+                      <span>
+                        <strong>TIME</strong>
+                        {booking.startTime && booking.endTime
+                          ? `${booking.startTime} – ${booking.endTime}`
+                          : "Not specified"}
+                      </span>
+
+                      <span>
+                        <strong>ATTENDEES</strong>
+                        {booking.attendees ?? "Not specified"}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </article>
-            ))
+                </article>
+              );
+            })
           ) : (
             <div className="bookings-empty">
-              <h3>
-                {myBookings.length === 0
-                  ? 'No bookings yet'
-                  : `No ${selectedFilter.toLowerCase()} bookings`}
-              </h3>
               <p>
-                Explore campus venues to find a space for your next event.
+                {bookings.length === 0
+                  ? "You haven't submitted any booking requests yet."
+                  : "No requests match this filter."}
               </p>
-              <Link to="/venues" className="booking-primary-link">
+
+              <Link className="booking-primary-link" to="/venues">
                 Browse venues
               </Link>
             </div>
@@ -178,14 +197,14 @@ function MyBookingsPage() {
         </div>
 
         <p className="demo-data-note">
-          Demo mode: bookings are read from browser storage. Real
-          accounts and server persistence require backend integration.
+          Booking information is displayed using the data source
+          configured for this project.
         </p>
       </section>
 
       <Footer />
     </main>
-  )
+  );
 }
 
-export default MyBookingsPage
+export default MyBookingsPage;

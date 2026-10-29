@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import Navbar from '../../components/layout/Navbar.jsx'
 import Footer from '../../components/layout/Footer.jsx'
 import { getVenues } from '../../data/demoStore.js'
 
@@ -41,7 +40,7 @@ function VenueCatalogPage() {
 
   return (
     <main className="catalog-page">
-      <Navbar />
+      
 
       <section className="catalog-heading">
         <p className="eyebrow">COEP / CAMPUS DIRECTORY</p>

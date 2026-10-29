@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import Navbar from "../../components/layout/Navbar.jsx";
+
 import Footer from "../../components/layout/Footer.jsx";
 import {
   getVenues,
@@ -127,7 +127,7 @@ function ApprovalsPage() {
 
   return (
     <main className="approvals-page">
-      <Navbar />
+      
 
       <section className="approvals-heading">
         <p className="eyebrow">COEP / APPROVER DESK</p>
